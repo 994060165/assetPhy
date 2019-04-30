@@ -25,6 +25,7 @@ const imgAudit = r => require.ensure([], () => r(require('@/views/imgAudit/imgAu
 const checkLabel = r => require.ensure([], () => r(require('@/views/checkLabel/index')), 'checkLabel')
 const changeCheckLabel = r => require.ensure([], () => r(require('@/views/checkLabel/changeCheckLabel')), 'changeCheckLabel')
 const labelPaste = r => require.ensure([], () => r(require('@/views/labelManage/labelPaste/index')), 'labelPaste')
+const labelGrant = r => require.ensure([], () => r(require('@/views/labelManage/grantLabel/index')), 'labelGrant')
 
 Vue.use(VueRouter)
 let route = [
@@ -131,6 +132,11 @@ let route = [
         path: '/labelPaste',
         name: 'labelPaste',
         component: labelPaste
+      },
+      {
+        path: '/labelGrant',
+        name: 'labelGrant',
+        component: labelGrant
       }
     ]
   }

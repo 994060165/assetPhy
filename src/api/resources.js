@@ -1,7 +1,9 @@
 import axios from 'axios'
 import querystring from 'querystring'
-
-axios.defaults.baseURL = `/asset`
+import { type } from '../../static/data'
+// axios 配置
+axios.defaults.timeout = 1 * 60 * 1000 * 10
+axios.defaults.baseURL = `/${type}`
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 // Add a request interceptor

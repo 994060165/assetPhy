@@ -1,12 +1,23 @@
 <template>
-<div class="main">
+<!-- <div >
   <navbar></navbar>
-  <sidebar></sidebar>
   <div class="main__wrapper">
-    <!-- <div class="title"><h3>{{title}}</h3></div> -->
+    <sidebar></sidebar>
+    <div class="title"><h3>{{title}}</h3></div>
     <router-view class="main__view" ></router-view>
   </div>
-</div>
+</div> -->
+<div>
+    <navbar></navbar>
+    <div class="main">
+      <aside style="overflow-y: scroll;">
+        <sidebar></sidebar>
+      </aside>
+      <div class="content-container whiteBg">
+        <router-view></router-view>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -97,3 +108,51 @@ export default {
   }
 }
 </style>
+<style lang="scss">
+.main {
+  display: flex;
+  width: 100%;
+  position: absolute;
+  top: 63px;
+  bottom: 0px;
+  overflow: hidden;
+  aside {
+    flex:0 0 200px;
+    width: 200px;
+    .el-menu{
+      height: 100%;
+    }
+    .collapsed{
+      width:60px;
+      .item{
+        position: relative;
+      }
+      .submenu{
+        position:absolute;
+        top:0px;
+        left:60px;
+        z-index:99999;
+        height:auto;
+        display:none;
+      }
+    }
+  }
+  .menu-collapsed{
+    flex:0 0 60px;
+    width: 60px;
+  }
+  .menu-expanded{
+    flex:0 0 220px;
+    width: 220px;
+  }
+  .content-container {
+    flex:1;
+    padding: 10px;
+    overflow-x: hidden;
+  }
+}
+.whiteBg {
+  background: white;
+}
+</style>
+

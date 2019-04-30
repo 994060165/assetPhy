@@ -70,14 +70,8 @@ export default {
 @import '../../assets/styles/base.scss';
 
 .main__sidebar {
-    position: fixed;
-    top: $global-navbar-height;
-    left: 0;
-    bottom: 0;
-    width: $global-sidebar-width;
-    max-height: 100vh;
+    width: 100%;
     height: 100%;
-    z-index: 1;
     background: #263548;
     box-shadow: 0 2px 3px hsla(0,0%,7%,.1),0 0 0 1px hsla(0,0%,7%,.1);
     overflow-y: auto;
