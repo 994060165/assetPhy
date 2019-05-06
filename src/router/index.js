@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import assetPhyNewRoutes from '@/tassetPhyNew/router/index'
 import sysRoutes from '@/system/router/index'
 import assetRoutes from '@/ewm/router/index'
 const login = r => require.ensure([], () => r(require('@/system/modules/login/login')), 'login')
@@ -141,7 +142,7 @@ let route = [
     ]
   }
 ]
-let allRoute = route.concat(sysRoutes).concat(assetRoutes)
+let allRoute = route.concat(sysRoutes).concat(assetRoutes).concat(assetPhyNewRoutes)
 const router = new VueRouter({
   routes: allRoute
 })

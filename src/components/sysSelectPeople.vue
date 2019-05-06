@@ -1,17 +1,19 @@
 <template>
   <el-dialog
     class="sys userDialog"
-    title="添加人员"
+    width="70%"
+    :title="dialogTitle"
     :visible="dialogVisible"
     :showClose="false">
-    <el-input
-      placeholder="请输入检索关键字"
-      icon="search"
-      v-model="queryKey"
-      @keyup.enter.native="retrieveData"
-      width="100%"
-      @click="retrieveData">
-    </el-input>
+    <el-row class="text-right">
+      <el-input
+        placeholder="请输入检索关键字"
+        v-model="queryKey"
+        @keyup.enter.native="retrieveData"
+        style="width: 50%; text-align: right;">
+        <el-button slot="append" icon="el-icon-search" @click="retrieveData"></el-button>
+      </el-input>
+      </el-row>
     <el-table
       :data="tableData"
       style="width: 100%"
@@ -50,7 +52,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page.sync="currentPage"
-        :page-size="10"
+        :page-size="pageSize"
         layout="total, prev, pager, next"
         :total="total">
       </el-pagination>
@@ -72,6 +74,14 @@ export default {
         return {}
       }
     },
+    OrgID: {
+      type: String,
+      default: ''
+    },
+    dialogTitle: {
+      type: String,
+      default: '添加人员'
+    },
     roleId: {
       type: String,
       'default' () {
@@ -83,7 +93,7 @@ export default {
     return {
       tableData: [],
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 5,
       queryKey: '',
       total: 0,
       localVisible: this.dialogVisible,
@@ -126,9 +136,12 @@ export default {
       let params = {
         UserID: this.queryKey,
         page: this.currentPage,
-        pagesize: this.pageSize
+        pagesize: this.pageSize,
+        OrgID: this.OrgID
+        // OrgID: 'cnicg'
       }
-      this.$request.post('/sys/index/getAlluser', params).then(res => {
+      // this.$request.post('/sys/index/getAlluser', params).then(res => {
+      this.$request.post('/sys/index/getUsersByOrgID', params).then(res => {
         let data = res.data
         if (res.data) {
           this.tableData = data.data

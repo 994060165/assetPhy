@@ -119,6 +119,7 @@ export default {
   aside {
     flex:0 0 200px;
     width: 200px;
+    z-index: 999;
     .el-menu{
       height: 100%;
     }
