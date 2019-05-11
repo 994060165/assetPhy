@@ -75,7 +75,7 @@
       <el-table-column label="操作" width="120" slot="handle">
         <template slot-scope="scope">
           <el-button size="mini" icon="el-icon-edit" title="变更责任人" type="success" @click="changeAsset(scope.row, 'person')"></el-button>
-          <el-button size="mini" icon="el-icon-setting" title="变更部门" type="primary" @click="changeAsset(scope.row, 'deparment')"></el-button>
+          <el-button size="mini" icon="el-icon-setting" title="变更部门" type="primary" @click="changeAsset(scope.row, 'dept')"></el-button>
           <el-button size="mini" icon="el-icon-edit-outline" title="变更责任人和部门" type="warning" @click="changeAsset(scope.row, 'all')"></el-button>
         </template>
       </el-table-column>

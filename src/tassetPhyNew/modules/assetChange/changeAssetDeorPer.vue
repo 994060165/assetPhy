@@ -1,9 +1,9 @@
 <template>
   <el-row class="changeCheckLabel">
-    <el-row class="padding-10 text-left headerTitle">
-      <el-button type="primary" @click="goBack">返回</el-button>
-      <el-button type="primary" @click="submit">提交</el-button>
-    </el-row>
+      <el-row class="padding-10 text-left headerTitle" id="create_protect_top">
+        <el-button type="primary" @click="goBack">返回</el-button>
+        <el-button type="primary" @click="submit">提交</el-button>
+      </el-row>
     <el-row class="interval"></el-row>
     <el-collapse v-model="activeNames" v-loading="loading">
       <div class="padding-20">
@@ -35,9 +35,11 @@
 
 <script>
 import moment from 'moment'
+import fixarea from '@/components/fixarea.vue'
 import assetInfoDetail from '../../components/detail/assetInfo.vue'
 import assetImgDetail from '../../components/detail/assetImg.vue'
 import assetChangeEdit from './edit/assetChangeEdit.vue'
+import {commonService} from './service/commonService.js'
 import {TokenAPI} from '@/request/TokenAPI'
 import api from '@/api'
 export default {
@@ -50,8 +52,12 @@ export default {
       loading: false,
       assetNum: '',
       activeNames: ['1', '2', '3'],
-      changeInfo: {},
-      type: 'person'
+      changeInfo: {
+        userList: [],
+        deptList: []
+      },
+      type: 'person',
+      flow: commonService.changeFlow
     }
   },
   mounted () {
@@ -81,8 +87,55 @@ export default {
     },
     // 提交
     submit () {
+      console.log('changeInfo', this.changeInfo)
       let isValid = this.validateForm(['changeForm'])
-      console.log(isValid)
+      if (isValid) {
+        let judge = this.judgeObj()
+        if (judge) {
+          let params = {
+            token: this.token,
+            'asset_num': this.assetNum,
+            'flow_id': this.flow[this.type],
+            c01: this.changeInfo.userList[0].UserID,
+            c02: this.changeInfo.userList[0].OrgID
+          }
+          console.log('params', params)
+        }
+      }
+    },
+    judgeObj () {
+      let userList = this.changeInfo.userList
+      let deptList = this.changeInfo.deptList
+      let judge = false
+      if (this.type === 'person') {
+        if (userList.length > 0) {
+          judge = true
+        } else {
+          this.errMsg('请您选则一个责任人！')
+          return false
+        }
+      } else if (this.type === 'dept') {
+        if (deptList.length > 0) {
+          judge = true
+        } else {
+          this.errMsg('请您选则部门！')
+          return false
+        }
+      } else {
+        if (userList.length > 0 && deptList.length > 0) {
+          judge = true
+        } else {
+          this.errMsg('请您选中要变更部门和人员！')
+          return false
+        }
+      }
+      return judge
+    },
+    errMsg (msg) {
+      this.$message({
+        type: 'error',
+        message: msg
+      })
     },
     // 判断表单验证
     validateForm (formArr) {
@@ -98,7 +151,7 @@ export default {
     }
   },
   components: {
-    assetInfoDetail, assetImgDetail, assetChangeEdit
+    assetInfoDetail, assetImgDetail, assetChangeEdit, fixarea
   }
 }
 </script>

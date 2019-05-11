@@ -66,13 +66,17 @@ export default {
     navbar,
     sidebar
   },
-  created () {
+  mounted () {
+  },
+  // 移除监听
+  beforeDestroy: function () {
   },
   methods: {
   }
 }
 </script>
 
+<style src="./assets/base.css"></style>
 <style lang="scss">
 @import '../assets/styles/base.scss';
 
