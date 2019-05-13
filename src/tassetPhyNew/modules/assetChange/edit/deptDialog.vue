@@ -1,7 +1,7 @@
 <template>
   <!-- 部门选择组件 -->
   <div class="cn-form">
-    <el-dialog title="部门选择组件" size="small" 
+    <el-dialog title="选择部门" size="small" 
       :visible.sync="orgDialogVisable" 
       :modal="modalData" 
       :before-close="handleClose">

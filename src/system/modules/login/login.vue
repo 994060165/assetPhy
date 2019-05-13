@@ -9,7 +9,7 @@
                 <el-tab-pane label="账户登录" name="first">
                   <loginForm></loginForm>
                 <el-row class="padding-10">
-                  <span class="font-14 color-blue cursor-pointer text-left" @click="gotoEscience">科技云通行证登录</span>
+                  <!-- <span class="font-14 color-blue cursor-pointer text-left" @click="gotoEscience">科技云通行证登录</span> -->
                   <span class="font-14 color-blue cursor-pointer pull-right" @click="getPassWord">找回密码</span>
                 </el-row>
                 </el-tab-pane>

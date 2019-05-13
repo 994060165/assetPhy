@@ -1,9 +1,5 @@
 <template>
   <el-row class="changeCheckLabel">
-      <el-row class="padding-10 text-left headerTitle" id="create_protect_top">
-        <el-button type="primary" @click="goBack">返回</el-button>
-        <el-button type="primary" @click="submit">提交</el-button>
-      </el-row>
     <el-row class="interval"></el-row>
     <el-collapse v-model="activeNames" v-loading="loading">
       <div class="padding-20">
@@ -28,6 +24,10 @@
           v-if="dataLoad"
           :changeInfo="changeInfo">
         </assetChangeEdit>
+        <el-row class="padding-10 text-left headerTitle" id="create_protect_top">
+          <el-button type="primary" @click="goBack">取消</el-button>
+          <el-button type="primary" @click="submit">提交</el-button>
+        </el-row>
       </div>
     </el-collapse>
   </el-row>
@@ -41,6 +41,7 @@ import assetImgDetail from '../../components/detail/assetImg.vue'
 import assetChangeEdit from './edit/assetChangeEdit.vue'
 import {commonService} from './service/commonService.js'
 import {TokenAPI} from '@/request/TokenAPI'
+import {AssetChangeAPI} from './service/assetChangeAPI.js'
 import api from '@/api'
 export default {
   data () {
@@ -96,10 +97,30 @@ export default {
             token: this.token,
             'asset_num': this.assetNum,
             'flow_id': this.flow[this.type],
-            c01: this.changeInfo.userList[0].UserID,
-            c02: this.changeInfo.userList[0].OrgID
+            c01: this.changeInfo.userList[0] ? this.changeInfo.userList[0].UserID : '',
+            c02: this.changeInfo.deptList[0] ? this.changeInfo.deptList[0].OrgID : '',
+            info: this.changeInfo.explain
           }
           console.log('params', params)
+          AssetChangeAPI.setChangeDeporPer(params).then(data => {
+            if (data.result === '-1') {
+              this.$message({
+                type: 'error',
+                message: '提交失败！'
+              })
+            } else {
+              this.$message({
+                type: 'success',
+                message: '提交成功！'
+              })
+              this.goBack()
+            }
+          }, () => {
+            this.$message({
+              type: 'error',
+              message: `网络原因，提交失败！`
+            })
+          })
         }
       }
     },
