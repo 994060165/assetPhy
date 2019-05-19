@@ -2,7 +2,7 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>我的变更列表</el-breadcrumb-item>
+      <el-breadcrumb-item>审批变更表</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
@@ -60,7 +60,8 @@
      <el-table :data="tableList">
       <el-table-column type="index" label="序号" width="80"></el-table-column>
       <el-table-column prop="name" label="申请人"></el-table-column>
-      <el-table-column prop="asset_num" label="申请类型">
+      <el-table-column prop="flowName" label="申请类型"></el-table-column>
+      <el-table-column prop="asset_num" label="资产编号">
       </el-table-column>
     </el-table>
   </el-row>
