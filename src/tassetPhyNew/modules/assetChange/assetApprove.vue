@@ -18,15 +18,16 @@
       </div>
       <el-row class="interval"></el-row>
       <div class="padding-10">
-        <assetChangeEdit
+        <assetChangeDetail
           ref="changeForm"
           :type="type"
           v-if="dataLoad"
-          :changeInfo="changeInfo">
-        </assetChangeEdit>
+          :assetFlowInfo="assetFlowInfo">
+        </assetChangeDetail>
         <el-row class="padding-10 text-left headerTitle" id="create_protect_top">
-          <el-button type="primary" @click="goBack">取消</el-button>
-          <el-button type="primary" @click="submit">提交</el-button>
+          <el-button type="primary" @click="goBack">返回</el-button>
+          <el-button type="danger" @click="reject">驳回</el-button>
+          <el-button type="success" @click="submit">提交</el-button>
         </el-row>
       </div>
     </el-collapse>
@@ -38,7 +39,7 @@ import moment from 'moment'
 import fixarea from '@/components/fixarea.vue'
 import assetInfoDetail from '../../components/detail/assetInfo.vue'
 import assetImgDetail from '../../components/detail/assetImg.vue'
-import assetChangeEdit from './edit/assetChangeEdit.vue'
+import assetChangeDetail from './detail/assetChangeDetail.vue'
 import {commonService} from './service/commonService.js'
 import {TokenAPI} from '@/request/TokenAPI'
 import {AssetChangeAPI} from './service/assetChangeAPI.js'
@@ -52,17 +53,16 @@ export default {
       dataLoad: false,
       loading: false,
       assetNum: '',
+      orderNum: '',
       activeNames: ['1', '2', '3'],
-      changeInfo: {
-        userList: [],
-        deptList: []
-      },
+      assetFlowInfo: {},
       type: 'person',
       flow: commonService.changeFlow
     }
   },
   mounted () {
     this.assetNum = this.$route.params.assetNum
+    this.orderNum = this.$route.params.orderNum
     this.type = this.$route.params.type
     this.getAssetInfo()
   },
@@ -86,71 +86,45 @@ export default {
         this.loading = false
       })
     },
-    // 提交
-    submit () {
-      console.log('changeInfo', this.changeInfo)
-      let isValid = this.validateForm(['changeForm'])
-      if (isValid) {
-        let judge = this.judgeObj()
-        if (judge) {
-          let params = {
-            token: this.token,
-            'asset_num': this.assetNum,
-            'flow_id': this.flow[this.type],
-            c01: this.changeInfo.userList[0] ? this.changeInfo.userList[0].UserID : '',
-            c02: this.changeInfo.deptList[0] ? this.changeInfo.deptList[0].OrgID : '',
-            c03: this.changeInfo.explain
-          }
-          console.log('params', params)
-          AssetChangeAPI.setChangeDeporPer(params).then(data => {
-            if (data.result === '-1') {
-              this.$message({
-                type: 'error',
-                message: '提交失败！'
-              })
-            } else {
-              this.$message({
-                type: 'success',
-                message: '提交成功！'
-              })
-              this.goBack()
-            }
-          }, () => {
-            this.$message({
-              type: 'error',
-              message: `网络原因，提交失败！`
-            })
-          })
-        }
-      }
+    // 驳回
+    reject () {
+      this.$confirm('是否驳回?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // tt
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        })
+      })
     },
-    judgeObj () {
-      let userList = this.changeInfo.userList
-      let deptList = this.changeInfo.deptList
-      let judge = false
-      if (this.type === 'person') {
-        if (userList.length > 0) {
-          judge = true
-        } else {
-          this.errMsg('请您选则一个责任人！')
-          return false
-        }
-      } else if (this.type === 'dept') {
-        if (deptList.length > 0) {
-          judge = true
-        } else {
-          this.errMsg('请您选则部门！')
-          return false
-        }
-      } else {
-        if (userList.length > 0 && deptList.length > 0) {
-          judge = true
-        } else {
-          this.errMsg('请您选中要变更部门和人员！')
-          return false
-        }
+    // 提交
+    submit (type) {
+      let params = {
+        token: this.token,
+        'asset_num': this.assetNum,
+        'order_no': this.orderNum,
+        'result_tag': type,
+        c01: this.assetFlowInfo.c01,
+        c02: this.assetFlowInfo.c02
       }
-      return judge
+      console.log('params', params)
+      AssetChangeAPI.setChangeDeporPer(params).then(data => {
+        if (data.result === '-1') {
+          this.errMsg('审核失败')
+        } else {
+          this.$message({
+            type: 'success',
+            message: '提交成功！'
+          })
+          this.goBack()
+        }
+      }, () => {
+        this.errMsg('审核失败')
+      })
     },
     errMsg (msg) {
       this.$message({
@@ -172,7 +146,7 @@ export default {
     }
   },
   components: {
-    assetInfoDetail, assetImgDetail, assetChangeEdit, fixarea
+    assetInfoDetail, assetImgDetail, assetChangeDetail, fixarea
   }
 }
 </script>

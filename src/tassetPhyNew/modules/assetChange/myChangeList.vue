@@ -2,7 +2,7 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>审批变更表</el-breadcrumb-item>
+      <el-breadcrumb-item>待处理列表</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
@@ -58,10 +58,48 @@
   </el-row> -->
   <el-row class="padding-10" v-loading="loading">
      <el-table :data="tableList">
-      <el-table-column type="index" label="序号" width="80"></el-table-column>
-      <el-table-column prop="name" label="申请人"></el-table-column>
-      <el-table-column prop="flowName" label="申请类型"></el-table-column>
-      <el-table-column prop="asset_num" label="资产编号">
+      <el-table-column
+        type="index" 
+        label="序号" 
+        width="80">
+      </el-table-column>
+      <el-table-column
+        prop="asset_name"
+        show-overflow-tooltip
+        label="资产名称">
+      </el-table-column>
+      <el-table-column
+        prop="asset_num" 
+        width="140"
+        label="资产编号">
+      </el-table-column>
+      <el-table-column
+        prop="flow_id"
+        show-overflow-tooltip
+        width="240"
+        label="申请类型">
+        <template slot-scope="scope">
+          {{flowNameOption[scope.row.flow_id]}}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="create_user" 
+        show-overflow-tooltip
+        width="120"
+        label="申请人">
+      </el-table-column>
+      <el-table-column
+        prop="create_date" 
+        show-overflow-tooltip
+        width="180"
+        label="申请时间">
+      </el-table-column>
+      <el-table-column
+        width="50"
+        label="操作">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="goPath(scope.row)" icon="el-icon-search"></el-button>
+        </template>
       </el-table-column>
     </el-table>
   </el-row>
@@ -81,6 +119,7 @@
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import {AssetChangeAPI} from './service/assetChangeAPI.js'
+import {commonService} from './service/commonService.js'
 export default {
   data () {
     return {
@@ -98,7 +137,9 @@ export default {
       token: TokenAPI.getToken(),
       grantShow: false,
       searchForm: {
-      }
+      },
+      flowNameOption: commonService.flowNameOption,
+      flowTran: commonService.flowTran
     }
   },
   mounted () {
@@ -132,21 +173,15 @@ export default {
         token: this.token
       }
       AssetChangeAPI.getMyBackOrder(params).then(data => {
-        this.total = data.count
+        // this.total = data.count
         this.tableList = data.data
       }).finally(() => {
         this.loading = false
       })
     },
     // 点击申请更换责任人或部门或两者都换
-    changeAsset (row, type) {
-      this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
-    },
-    importLabel () {
-      this.grantShow = true
-    },
-    handleClose () {
-      this.grantShow = false
+    goPath (row) {
+      this.$router.push(`/asset/assetApprove/${row.asset_num}/${row.order_no}/${this.flowTran[row.flow_id]}`)
     }
   },
   components: {

@@ -3,6 +3,7 @@ const assetPhyNew = r => require.ensure([], () => r(require('../App')), 'sys')
 const assetChangeIndex = r => require.ensure([], () => r(require('../modules/assetChange/index')), 'assetChangeIndex')
 const changeAssetDeorPer = r => require.ensure([], () => r(require('../modules/assetChange/changeAssetDeorPer')), 'changeAssetDeorPer')
 const myChangeList = r => require.ensure([], () => r(require('../modules/assetChange/myChangeList')), 'myChangeList')
+const assetApprove = r => require.ensure([], () => r(require('../modules/assetChange/assetApprove')), 'assetApprove')
 
 const modulePath = '/asset'
 
@@ -23,6 +24,10 @@ const assetPhyNewRoutes = {
     {
       path: 'myChangeList',
       component: myChangeList
+    },
+    {
+      path: 'assetApprove/:assetNum/:orderNum/:type',
+      component: assetApprove
     }
   ]
 }
