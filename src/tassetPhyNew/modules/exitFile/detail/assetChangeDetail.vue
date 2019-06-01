@@ -1,6 +1,6 @@
 <template>
   <el-collapse-item title="变更信息" name="3" class="detail">
-    <el-form ref="changeForm" label-width="120px">
+    <el-form ref="changeForm" :model="changeInfo" label-width="120px">
       <el-row class="m-t-20" v-if="type === 'dept' || type === 'all'">
         <el-col :span="12">
           <el-form-item label="变更部门">
@@ -13,7 +13,7 @@
       </el-row>
       <el-row class="m-t-20" v-if="type === 'person' || type === 'all'">
         <el-col :span="12">
-          <el-form-item label="变更后责任人">
+          <el-form-item label="变更责任人" required>
             <div class="panelBody" style="width: 100%;">
             {{assetFlowInfo.c01}}
             </div>
@@ -24,7 +24,7 @@
       <el-row class="m-t-20">
         <el-col :span="12">
           <el-form-item label="变更说明" prop="explain">
-            {{assetFlowInfo.memo}}
+            {{assetFlowInfo.c03}}
           </el-form-item>
         </el-col>
       </el-row>

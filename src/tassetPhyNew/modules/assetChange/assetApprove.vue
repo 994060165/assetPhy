@@ -18,6 +18,16 @@
       </div>
       <el-row class="interval"></el-row>
       <div class="padding-10">
+        <div class="">
+          变更流程
+        </div>
+        <flowStep
+          v-if="flowStepVisible"
+          :orderNo="orderNum">
+        </flowStep>
+      </div>
+      <el-row class="interval"></el-row>
+      <div class="padding-10">
         <assetChangeDetail
           ref="changeForm"
           :type="type"
@@ -27,7 +37,7 @@
         <el-row class="padding-10 text-left headerTitle" id="create_protect_top">
           <el-button type="primary" @click="goBack">返回</el-button>
           <el-button type="danger" @click="reject">驳回</el-button>
-          <el-button type="success" @click="submit">提交</el-button>
+          <el-button type="success" @click="submit('1')">同意</el-button>
         </el-row>
       </div>
     </el-collapse>
@@ -37,12 +47,14 @@
 <script>
 import moment from 'moment'
 import fixarea from '@/components/fixarea.vue'
+import flowStep from '@/components/flowStep.vue'
 import assetInfoDetail from '../../components/detail/assetInfo.vue'
 import assetImgDetail from '../../components/detail/assetImg.vue'
 import assetChangeDetail from './detail/assetChangeDetail.vue'
 import {commonService} from './service/commonService.js'
 import {TokenAPI} from '@/request/TokenAPI'
-import {AssetChangeAPI} from './service/assetChangeAPI.js'
+// import {AssetChangeAPI} from './service/assetChangeAPI.js'
+import {FlowAPI} from '@/api/flowAPI.js'
 import api from '@/api'
 export default {
   data () {
@@ -57,6 +69,7 @@ export default {
       activeNames: ['1', '2', '3'],
       assetFlowInfo: {},
       type: 'person',
+      flowStepVisible: false,
       flow: commonService.changeFlow
     }
   },
@@ -73,6 +86,7 @@ export default {
     },
     // 获取资产信息
     getAssetInfo () {
+      this.flowStepVisible = true
       this.loading = true
       let params = {
         asset_num: this.assetNum,
@@ -81,6 +95,19 @@ export default {
       api.fetchAssetList(params).then(data => {
         console.log('data', data)
         this.assetInfo = data.data[0]
+      }).finally(() => {
+        this.getFlowInfo()
+      })
+    },
+    getFlowInfo () {
+      let params = {
+        token: this.token,
+        order_no: this.orderNum
+      }
+      FlowAPI.getOrderInfo(params).then(data => {
+        if (data.orderaction) {
+          this.assetFlowInfo = data.orderaction.act01
+        }
       }).finally(() => {
         this.dataLoad = true
         this.loading = false
@@ -93,7 +120,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // tt
+        this.submit('0')
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -105,15 +132,12 @@ export default {
     submit (type) {
       let params = {
         token: this.token,
-        'asset_num': this.assetNum,
         'order_no': this.orderNum,
-        'result_tag': type,
-        c01: this.assetFlowInfo.c01,
-        c02: this.assetFlowInfo.c02
+        'result_tag': type
       }
       console.log('params', params)
-      AssetChangeAPI.setChangeDeporPer(params).then(data => {
-        if (data.result === '-1') {
+      FlowAPI.handleOutOrder(params).then(data => {
+        if (data.ID === '-1') {
           this.errMsg('审核失败')
         } else {
           this.$message({
@@ -146,7 +170,7 @@ export default {
     }
   },
   components: {
-    assetInfoDetail, assetImgDetail, assetChangeDetail, fixarea
+    assetInfoDetail, assetImgDetail, assetChangeDetail, fixarea, flowStep
   }
 }
 </script>

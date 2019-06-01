@@ -99,7 +99,7 @@ export default {
             'flow_id': this.flow[this.type],
             c01: this.changeInfo.userList[0] ? this.changeInfo.userList[0].UserID : '',
             c02: this.changeInfo.deptList[0] ? this.changeInfo.deptList[0].OrgID : '',
-            memo: this.changeInfo.explain
+            c03: this.changeInfo.explain
           }
           console.log('params', params)
           AssetChangeAPI.setChangeDeporPer(params).then(data => {

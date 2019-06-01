@@ -732,3 +732,11 @@ body, html {
 .headerTitle .el-button {
     padding: 7px 10px;
 }
+.contentArea {
+    padding: 10px;
+    border: 1px solid #E5E5E5;
+}
+.formContent {
+    padding: 0 0 0 10px;
+    border: 1px solid #E5E5E5;
+}
