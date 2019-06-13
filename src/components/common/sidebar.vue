@@ -1,12 +1,28 @@
 <template>
 <div class="main__sidebar">
-  <el-menu :router="true" :default-active="currentRouter">
+  <el-menu
+    :router="true"
+    :default-active="currentRouter"
+    background-color="#263548"
+    text-color="#fff"
+    active-text-color="#ffd04b">
     <!-- <el-submenu v-if="menu1.children" v-for="(menu1, index) in currentMenu" :key="index" :index="menu1.children[0].path">
       <template slot="title"><i :class="`el-icon-${menu1.icon}`"></i>{{menu1.FunName}}</template>
       <el-menu-item v-for="(menu2, index) in menu1.children" :key="index" :index="menu2.path">{{menu2.FunName}}</el-menu-item>
     </el-submenu>  v-else-->
-    <el-menu-item  v-for="(menu1, index) in currentMenu" :key="index" :index="menu1.FunLink"><i :class="`el-icon-${menu1.icon}`"></i>{{menu1.FunName}}</el-menu-item>
+    <!-- <el-menu-item  v-for="(menu1, index) in currentMenu" :key="index" :index="menu1.FunLink">
+      <i :class="`el-icon-${menu1.icon}`"></i>{{menu1.FunName}}</el-menu-item> -->
+    <el-submenu 
+      v-for="(menu1, index) in currentMenu"
+      :key="index" 
+      :index="menu1.FunLink">
+        <template slot="title">{{menu1.FunName}}</template>
+        <el-menu-item v-for="(menu2, index2) in menu1.children" :key="index2" :index="menu2.FunLink">
+          {{menu2.FunName}}
+        </el-menu-item>
+    </el-submenu>
   </el-menu>
+  
 </div>
 </template>
 
@@ -76,21 +92,21 @@ export default {
     box-shadow: 0 2px 3px hsla(0,0%,7%,.1),0 0 0 1px hsla(0,0%,7%,.1);
     overflow-y: auto;
     overflow-x: hidden;
-    .el-menu {
-        border-radius: 0;
-        // height: 100%;
-        padding-top: 10px;
-        background: #263548;
-        border: none;
-        .el-menu-item,.el-menu-item:focus,.el-menu-item:visited,.el-menu-item:active{
-          color:#fff;
-          background: #263548;
-          border-bottom:1px solid #2d435a;
-          i{color: #fff;}
-        }
-        .el-menu-item:hover{
-          background-color: #2d435a;
-        }
-    }
+    // .el-menu {
+    //     border-radius: 0;
+    //     // height: 100%;
+    //     padding-top: 10px;
+    //     background: #263548;
+    //     border: none;
+    //     .el-menu-item,.el-menu-item:focus,.el-menu-item:visited,.el-menu-item:active{
+    //       color:#fff;
+    //       background: #263548;
+    //       border-bottom:1px solid #2d435a;
+    //       i{color: #fff;}
+    //     }
+    //     .el-menu-item:hover{
+    //       background-color: #2d435a;
+    //     }
+    // }
 }
 </style>

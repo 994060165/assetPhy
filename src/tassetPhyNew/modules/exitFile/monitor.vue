@@ -2,7 +2,7 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>资产变更</el-breadcrumb-item>
+      <el-breadcrumb-item>出门受监控资产</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
@@ -11,7 +11,7 @@
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
     </el-input> -->
     <!-- 高级搜索 -->
-    <advancedSearch
+    <!-- <advancedSearch
       :searchPlaceholder="searchPlaceholder"
       :searchStyle="searchStyle"
       :advance="false"
@@ -27,9 +27,6 @@
                   </el-form-item>
                   <el-form-item label="部门">
                     <el-input v-model="searchForm.deparment" placeholder="请输入部门"></el-input>
-                    <!-- <el-select  filterable clearable>
-                      <el-option v-for="(item, index) in allDeparments" :key="index" :label="item" :value="item"></el-option>
-                    </el-select> -->
                   </el-form-item>
                   <el-form-item label="资产最小价值">
                     <el-input-number v-model="searchForm.minvalue" :min="0" :step="100"></el-input-number>
@@ -41,9 +38,6 @@
                   </el-form-item>
                   <el-form-item label="责任人">
                     <el-input v-model="searchForm.zrr_name" placeholder="请输入人员姓名"></el-input>
-                    <!-- <el-select filterable clearable v-model="searchForm.zrr_name" placeholder="请选择责任人">
-                      <el-option v-for="(item, index) in allPersons" :key="index" :label="item" :value="item"></el-option>
-                    </el-select> -->
                   </el-form-item>
                   <el-form-item label="资产最大价值">
                     <el-input-number v-model="searchForm.maxvalue" :min="0" :step="100"></el-input-number>
@@ -53,9 +47,6 @@
                   <el-form-item label="资产标签号">
                     <el-input v-model="searchForm.tag_num"></el-input>
                   </el-form-item>
-                  <!-- <el-form-item label="父资产名称">
-                    <el-input v-model="searchForm.parent_name"></el-input>
-                  </el-form-item> -->
                   <el-form-item label="启用日期">
                     <el-date-picker v-model="searchForm.start_time" type="daterange" placeholder="选择领用日期范围"></el-date-picker>
                   </el-form-item>
@@ -67,19 +58,65 @@
             <el-button type="primary" @click="getAssetBySearch">筛选</el-button>
           </el-row>
         </div>
-    </advancedSearch>  
+    </advancedSearch>   -->
   </el-row>
   <el-row class="padding-10" v-loading="loading">
-    <assetTable
-      :tableList="tableList">
-      <el-table-column label="操作" width="120" slot="handle">
-        <template slot-scope="scope">
-          <el-button size="mini" icon="el-icon-edit" title="变更责任人" type="success" @click="changeAsset(scope.row, 'person')"></el-button>
-          <el-button size="mini" icon="el-icon-setting" title="变更部门" type="primary" @click="changeAsset(scope.row, 'dept')"></el-button>
-          <el-button size="mini" icon="el-icon-edit-outline" title="变更责任人和部门" type="warning" @click="changeAsset(scope.row, 'all')"></el-button>
-        </template>
-      </el-table-column>
-    </assetTable>
+     <el-table :data="tableList">
+        <el-table-column type="index" label="序号" width="80"></el-table-column>
+        <el-table-column prop="asset_num" label="资产编码">
+        </el-table-column>
+        <el-table-column 
+          prop="name" 
+          label="资产名称">
+        </el-table-column>
+        <el-table-column
+          prop="deparment" 
+          show-overflow-tooltip 
+          label="部门">
+        </el-table-column>
+        <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
+        <el-table-column label="申请日期">
+          <template slot-scope="scope">
+            {{scope.row.start_time | moment}}
+          </template>
+        </el-table-column>
+        <el-table-column 
+          prop="deparment" 
+          show-overflow-tooltip 
+          label="出门理由">
+        </el-table-column>
+        <el-table-column
+          prop="deparment"
+          show-overflow-tooltip 
+          label="去向地点">
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip 
+          label="预计回归日期">
+            <template slot-scope="scope">
+              {{scope.row.start_time | moment}}
+            </template>
+        </el-table-column>
+        <el-table-column
+          prop="deparment" 
+          show-overflow-tooltip 
+          label="申请类型">
+        </el-table-column>
+        <el-table-column
+          width="80"
+          show-overflow-tooltip 
+          label="操作">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                icon="el-icon-edit"
+                title="设置提醒"
+                type="success"
+                @click="remind(scope.row)">
+              </el-button>
+            </template>
+        </el-table-column>
+      </el-table>
   </el-row>
   <el-row class="padding-10 text-right">
     <el-pagination
@@ -90,6 +127,14 @@
       :total="total">
     </el-pagination>
   </el-row>
+  <exitFileDetail
+    v-if="dialogVisible"
+    :dialogVisible="dialogVisible"
+    :dialogTitle="dialogTitle"
+    :assetFlowInfo="assetFlowInfo"
+    @closeDialog="closeDialog">
+
+  </exitFileDetail>
 </div>
 </template>
 
@@ -98,6 +143,7 @@ import assetTable from '@/tassetPhyNew/components/assetTable.vue'
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import service from '@/api/service.js'
+import exitFileDetail from './detail/exitFileDetail.vue'
 export default {
   data () {
     return {
@@ -115,7 +161,10 @@ export default {
       token: TokenAPI.getToken(),
       grantShow: false,
       searchForm: {
-      }
+      },
+      dialogVisible: false,
+      dialogTitle: '出门条提醒设置',
+      assetFlowInfo: {}
     }
   },
   mounted () {
@@ -160,6 +209,13 @@ export default {
         this.loading = false
       })
     },
+    remind (row) {
+      this.assetFlowInfo = Object.assign({}, row)
+      this.dialogVisible = true
+    },
+    closeDialog () {
+      this.dialogVisible = false
+    },
     // 点击申请更换责任人或部门或两者都换
     changeAsset (row, type) {
       this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
@@ -172,7 +228,7 @@ export default {
     }
   },
   components: {
-    assetTable, advancedSearch
+    assetTable, advancedSearch, exitFileDetail
   }
 }
 </script>

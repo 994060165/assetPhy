@@ -12,12 +12,15 @@
           class="menutree"
           :data="menuDatas"
           :props="props"
+          show-checkbox
+          @check-change="handleCheckChange"
           :render-content="renderContent"
-          node-key="id"
+          :default-checked-keys="defalutKey"
+          node-key="FunID"
           :expand-on-click-node="true">
         </el-tree>
       </el-col>
-      <el-col :span="12">
+      <!-- <el-col :span="12">
         <el-tag
           v-for="tag in tags"
           :key="tag.FunID"
@@ -27,11 +30,12 @@
           :type="tag.type">
           {{tag.FunName}}
         </el-tag>
-      </el-col>
+      </el-col> -->
     </el-row>
     <div slot="footer" class="dialog-footer">
+      <!-- <el-button @click="showMenu"></el-button> -->
       <el-button @click="handleCancel">取 消</el-button>
-      <el-button type="primary" @click="handleConfirm">确 定</el-button>
+      <el-button type="primary" @click="showMenu">确 定</el-button>
     </div>
  </el-dialog>
 </template>
@@ -54,8 +58,9 @@
     data () {
       return {
         loading2: true,
+        menuArr: [],
         props: {
-          id: 'InnerID',
+          FunID: 'FunID',
           label: 'FunName',
           children: 'children'
         },
@@ -64,7 +69,8 @@
         rawTags: {},
         rawLength: 0,
         menuData: [],
-        expendIds: []
+        expendIds: [],
+        defalutKey: []
       }
     },
     mounted () {
@@ -77,6 +83,23 @@
     created () {
     },
     methods: {
+      showMenu () {
+        let nodes = this.$refs.menutree.getCheckedNodes()
+        console.log('menu', nodes)
+        // this.$refs.tree.setCheckedNodes(selectedNodes)
+        let arr = []
+        nodes.forEach(value => {
+          arr.push(value.FatherID)
+          arr.push(value.FunID)
+        })
+        arr.push('home')
+        this.menuArr = Array.from(new Set(arr))
+        console.log(this.menuArr)
+        this.handleConfirm()
+      },
+      handleCheckChange (data, checked, indeterminate) {
+        console.log(data, checked, indeterminate)
+      },
       // 获取菜单数据
       getMenusData () {
         this.$request.get(`/sys/index/gettree`).then(res => {
@@ -113,19 +136,30 @@
               }
             }
           }
-          this.menuDatas = one
-          this.loading2 = false
-          this.getRoleMenu()
+          this.getRoleMenu(one)
         })
       },
-      getRoleMenu () {
+      getRoleMenu (menuData) {
         let params = {
           RoleID: this.roleId
         }
         this.$request.post('/sys/index/getFuns', params).then(res => {
           if (res.data) {
             this.tags = res.data
+            let arr = []
+            this.tags.forEach(value => {
+              if (value.MenuLevelID === '2') {
+                let obj = {
+                  FunID: value.FunID
+                }
+                arr.push(obj.FunID)
+              }
+            })
+            this.menuDatas = menuData
+            this.defalutKey = arr
           }
+        }).finally(() => {
+          this.loading2 = false
         })
       },
       // 取消
@@ -155,17 +189,25 @@
       // 确定
       handleConfirm () {
         let menuIds = ''
-        this.tags.forEach((value, index) => {
-          if (index === this.tags.length - 1) {
-            menuIds += `${value.FunID}`
+        // this.tags.forEach((value, index) => {
+        //   if (index === this.tags.length - 1) {
+        //     menuIds += `${value.FunID}`
+        //   } else {
+        //     menuIds += `${value.FunID},`
+        //   }
+        // })
+        this.menuArr.forEach((value, index) => {
+          if (index === this.menuArr.length - 1) {
+            menuIds += `${value}`
           } else {
-            menuIds += `${value.FunID},`
+            menuIds += `${value},`
           }
         })
         let params = {
           RoleID: this.roleId,
           FunID: `${menuIds}`
         }
+        console.log(params)
         this.$request.post(`/sys/index/setRoleFuncs`, params).then(res => {
           console.log(res.data)
           let data = res.data

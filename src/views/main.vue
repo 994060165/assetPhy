@@ -117,8 +117,8 @@ export default {
   bottom: 0px;
   overflow: hidden;
   aside {
-    flex:0 0 200px;
-    width: 200px;
+    flex:0 0 220px;
+    width: 220px;
     z-index: 999;
     .el-menu{
       height: 100%;

@@ -258,7 +258,7 @@ body, html {
 }
 
 .main {
-	min-height: 500px;
+	min-height: 900px;
    /* background-color: #fff;*/
 }
 
@@ -739,4 +739,17 @@ body, html {
 .formContent {
     padding: 0 0 0 10px;
     border: 1px solid #E5E5E5;
+}
+.el-dialog__header {
+    padding: 20px 20px 10px;
+    text-align: left;
+    background: #42a5f5;
+    border-bottom: 1px solid #ebebeb;
+    /* padding: 15px; */
+    color: #fff;
+}
+.el-dialog__title {
+    line-height: 24px;
+    font-size: 18px;
+    color: #fff;
 }

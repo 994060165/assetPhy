@@ -7,6 +7,10 @@ const myChangeList = r => require.ensure([], () => r(require('../modules/assetCh
 const assetApprove = r => require.ensure([], () => r(require('../modules/assetChange/assetApprove')), 'assetApprove')
 // 出门流程
 const exitFileAdd = r => require.ensure([], () => r(require('../modules/exitFile/exitFileAdd')), 'exitFile/exitFileAdd')
+const exitFileList = r => require.ensure([], () => r(require('../modules/exitFile/exitFileList')), 'exitFile/exitFileList')
+const receiveExitFile = r => require.ensure([], () => r(require('../modules/exitFile/receiveExitFile')), 'exitFile/receiveExitFile')
+const myExitFileList = r => require.ensure([], () => r(require('../modules/exitFile/myExitFileList')), 'exitFile/myExitFileList')
+const monitor = r => require.ensure([], () => r(require('../modules/exitFile/monitor')), 'exitFile/monitor')
 
 const modulePath = '/asset'
 
@@ -36,6 +40,26 @@ const assetPhyNewRoutes = {
     {
       path: 'exitFileAdd',
       component: exitFileAdd
+    },
+    // 出门条管理
+    {
+      path: 'exitFileList',
+      component: exitFileList
+    },
+    // 领用出门条
+    {
+      path: 'receiveExitFile',
+      component: receiveExitFile
+    },
+    // 可用出门条
+    {
+      path: 'myExitFileList',
+      component: myExitFileList
+    },
+    // 出门受监控资产
+    {
+      path: 'exit/monitor',
+      component: monitor
     }
   ]
 }

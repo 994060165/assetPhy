@@ -1,5 +1,5 @@
 <template>
-  <div @click="hideSubOpertaion" class="sys rolelist sysRoleList">
+  <el-row>
     <div id="navbar">
       <el-row class="navRow">
         <el-col :span="10">
@@ -155,7 +155,7 @@
         <el-button @click="handleConfirmDelete">是</el-button>
       </div>
     </el-dialog>
-  </div>
+  </el-row>
 </template>
 <script>
 import {LocalRoleAPI} from '../../service/RoleService'
