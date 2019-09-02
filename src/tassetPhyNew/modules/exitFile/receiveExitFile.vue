@@ -2,7 +2,7 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>出门条管理</el-breadcrumb-item>
+      <el-breadcrumb-item>审批出门条</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
@@ -60,8 +60,14 @@
         </div>
     </advancedSearch>   -->
   </el-row>
+  <el-row class="text-center">
+    <el-radio-group v-model="tabs" @change="changeTab">
+      <el-radio-button label="pending">待审批</el-radio-button>
+      <el-radio-button label="processing">已审批</el-radio-button>
+    </el-radio-group>
+  </el-row>
   <el-row class="padding-10" v-loading="loading">
-     <el-table :data="tableList">
+    <el-table :data="tableList" v-if="tabs === 'pending'">
         <el-table-column type="index" label="序号" width="80"></el-table-column>
         <el-table-column prop="asset_num" label="资产编码">
         </el-table-column>
@@ -70,11 +76,10 @@
           label="资产名称">
         </el-table-column>
         <el-table-column
-          prop="deparment" 
+          prop="zrr_name" 
           show-overflow-tooltip 
-          label="部门">
+          label="申请人">
         </el-table-column>
-        <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
         <el-table-column label="申请日期">
           <template slot-scope="scope">
             {{scope.row.start_time | moment}}
@@ -97,36 +102,33 @@
               {{scope.row.start_time | moment}}
             </template>
         </el-table-column>
-        <el-table-column
-          prop="deparment" 
-          show-overflow-tooltip 
-          label="申请类型">
-        </el-table-column>
-        <el-table-column
-          width="80"
-          show-overflow-tooltip 
-          label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                icon="el-icon-edit"
-                title="设置提醒"
-                type="success"
-                @click="remind(scope.row)">
-              </el-button>
-            </template>
+        <el-table-column label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="goPath(scope.row)"></el-button>
+          </template>
         </el-table-column>
       </el-table>
+      <el-row class="padding-10 text-right">
+        <el-pagination
+          @current-change="handleChange"
+          :current-page="page"
+          :page-size="pagesize"
+          layout="total, prev, pager, next"
+          :total="total">
+        </el-pagination>
+      </el-row>
   </el-row>
-  <el-row class="padding-10 text-right">
-    <el-pagination
-      @current-change="handleChange"
-      :current-page="page"
-      :page-size="pagesize"
-      layout="total, prev, pager, next"
-      :total="total">
-    </el-pagination>
-  </el-row>
+      <el-row>
+        <el-upload class="upload-demo" ref="upload" 
+            action="" 
+            :multiple="false"
+            :before-upload="beforeUpload"
+            :file-list="fileList" 
+            :auto-upload="false">
+          <el-button slot="trigger" type="primary">选取文件</el-button>
+        </el-upload>
+        <el-button @click="submit">上传</el-button>
+      </el-row>
   <exitFileDetail
     v-if="dialogVisible"
     :dialogVisible="dialogVisible"
@@ -142,11 +144,14 @@
 import assetTable from '@/tassetPhyNew/components/assetTable.vue'
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
-import service from '@/api/service.js'
+import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
 import exitFileDetail from './detail/exitFileDetail.vue'
+import {commonService} from '../../service/commonService.js'
+import {imgToBase64} from '@/service/ocr.js'
 export default {
   data () {
     return {
+      fileList: [],
       searchStyle: 'width: auto;max-width: 294px;', // 高级搜索组件的input样式
       searchPlaceholder: '请输入查询内容', // 搜索框的默认
       keystr: '',
@@ -164,13 +169,23 @@ export default {
       },
       dialogVisible: false,
       dialogTitle: '出门条提醒设置',
-      assetFlowInfo: {}
+      assetFlowInfo: {},
+      tabs: 'pending',
+      flowNameOption: commonService.flowNameOption,
+      flowTran: commonService.flowTran
     }
   },
   mounted () {
     this.getTableList()
   },
   methods: {
+    submit () {
+      this.$refs.upload.submit()
+    },
+    beforeUpload (file) {
+      let result = imgToBase64(file)
+      console.log(result)
+    },
     goBack () {
       this.$router.go(-1)
     },
@@ -202,7 +217,8 @@ export default {
         pagesize: this.pagesize,
         token: this.token
       }
-      service.getassetlikeZRR(params).then(data => {
+      AssetChangeAPI.getMyBackOrder(params).then(res => {
+        let data = res.data
         this.total = data.count
         this.tableList = data.data
       }).finally(() => {
@@ -225,6 +241,10 @@ export default {
     },
     handleClose () {
       this.grantShow = false
+    },
+    // 点击审批出门条
+    goPath (row) {
+      this.$router.push(`/asset/exitFileApprove/${row.asset_num}/${row.order_no}`)
     }
   },
   components: {

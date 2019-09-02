@@ -20,5 +20,12 @@ export default {
    */
   uploadLabelGrant: params => {
     return axios.post(`/res/label/uploadLabelGrant`, params).then(res => res.data)
+  },
+  /**
+   * [getassetlikeZRR 查询责任人资产 支持模糊查询]
+   * @param {token,page,pagesize,keystr}
+   */
+  searchDoorList: params => {
+    return axios.post(`/res/door_guarder/search_rowlist`, params).then(res => res.data)
   }
 }

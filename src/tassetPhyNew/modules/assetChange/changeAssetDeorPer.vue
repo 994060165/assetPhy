@@ -39,9 +39,9 @@ import fixarea from '@/components/fixarea.vue'
 import assetInfoDetail from '../../components/detail/assetInfo.vue'
 import assetImgDetail from '../../components/detail/assetImg.vue'
 import assetChangeEdit from './edit/assetChangeEdit.vue'
-import {commonService} from './service/commonService.js'
+import {commonService} from '../../service/commonService.js'
 import {TokenAPI} from '@/request/TokenAPI'
-import {AssetChangeAPI} from './service/assetChangeAPI.js'
+import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
 import api from '@/api'
 export default {
   data () {

@@ -67,7 +67,7 @@
 <script>
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
-import {AssetChangeAPI} from './service/assetChangeAPI.js'
+import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
 // import {commonService} from './service/commonService.js'
 export default {
   data () {

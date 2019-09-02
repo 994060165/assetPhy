@@ -5,11 +5,10 @@
           v-for="(item, index) in steps"
           :key="index">
           <div slot="name">
-            hahah
           </div>
           <div
             slot="title">
-            {{item.act_state}}
+            {{item.act_stats}}
           </div>
           <div
             slot="description">
@@ -50,13 +49,15 @@ export default {
         token: this.token,
         order_no: this.orderNo
       }
+      FlowAPI.getFlowActionsToOrderNO(params).then(data => {
+        this.steps = data.data
+      })
       FlowAPI.getOrderInfo(params).then(data => {
         let arr = []
         let obj = data.orderaction
         for (let value in obj) {
           arr.push(obj[value])
         }
-        this.steps = arr
         this.active = arr.length - 1
       })
     }

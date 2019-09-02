@@ -1,4 +1,5 @@
 // 此处写sys的分支路由信息
+const doorLog = r => require.ensure([], () => r(require('../modules/exitFile/doorLog')), 'exitFile/doorLog')
 // 资产变更
 const assetPhyNew = r => require.ensure([], () => r(require('../App')), 'sys')
 const assetChangeIndex = r => require.ensure([], () => r(require('../modules/assetChange/index')), 'assetChangeIndex')
@@ -19,6 +20,11 @@ const assetPhyNewRoutes = {
   name: 'assetPhyNew',
   component: assetPhyNew,
   children: [
+    // 通道门日志管理
+    {
+      path: 'doorLog',
+      component: doorLog
+    },
     {
       path: 'assetChangeIndex',
       name: 'assetChangeIndex',

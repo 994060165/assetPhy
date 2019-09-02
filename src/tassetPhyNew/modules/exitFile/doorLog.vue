@@ -2,12 +2,16 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>待处理列表</el-breadcrumb-item>
+      <el-breadcrumb-item>通道门日志查看</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
-  <!-- <el-row class="padding-10 text-right">
-    <advancedSearch
+  <el-row class="padding-10 text-right">
+    <!-- <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
+      <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
+    </el-input> -->
+    <!-- 高级搜索 -->
+    <!-- <advancedSearch
       :searchPlaceholder="searchPlaceholder"
       :searchStyle="searchStyle"
       :advance="false"
@@ -54,54 +58,44 @@
             <el-button type="primary" @click="getAssetBySearch">筛选</el-button>
           </el-row>
         </div>
-    </advancedSearch>  
-  </el-row> -->
+    </advancedSearch>   -->
+  </el-row>
   <el-row class="padding-10" v-loading="loading">
      <el-table :data="tableList">
-      <el-table-column
-        type="index" 
-        label="序号" 
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="asset_name"
-        show-overflow-tooltip
-        label="资产名称">
-      </el-table-column>
-      <el-table-column
-        prop="asset_num" 
-        width="140"
-        label="资产编号">
-      </el-table-column>
-      <el-table-column
-        prop="flow_id"
-        show-overflow-tooltip
-        width="240"
-        label="申请类型">
-        <template slot-scope="scope">
-          {{flowNameOption[scope.row.flow_id]}}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="create_user" 
-        show-overflow-tooltip
-        width="120"
-        label="申请人">
-      </el-table-column>
-      <el-table-column
-        prop="create_date" 
-        show-overflow-tooltip
-        width="180"
-        label="申请时间">
-      </el-table-column>
-      <el-table-column
-        width="50"
-        label="操作">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="goPath(scope.row)" icon="el-icon-search"></el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column type="index" label="序号" width="80"></el-table-column>
+        <el-table-column 
+          prop="name" 
+          show-overflow-tooltip 
+          label="资产名称">
+          
+        </el-table-column>
+        <el-table-column 
+          prop="num" 
+          show-overflow-tooltip 
+          label="资产编号">
+        </el-table-column>
+        <el-table-column
+          prop="direction" 
+          show-overflow-tooltip 
+          label="方向">
+        </el-table-column>
+        <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
+        <el-table-column label="记录日期">
+          <template slot-scope="scope">
+            {{parseInt(scope.row.check_time) | moment}}
+          </template>
+        </el-table-column>
+        <el-table-column 
+          prop="epc" 
+          show-overflow-tooltip 
+          label="epc编码">
+        </el-table-column>
+        <el-table-column
+          prop="ed_group"
+          show-overflow-tooltip 
+          label="设备组">
+        </el-table-column>
+      </el-table>
   </el-row>
   <el-row class="padding-10 text-right">
     <el-pagination
@@ -112,14 +106,23 @@
       :total="total">
     </el-pagination>
   </el-row>
+  <exitFileDetail
+    v-if="dialogVisible"
+    :dialogVisible="dialogVisible"
+    :dialogTitle="dialogTitle"
+    :assetFlowInfo="assetFlowInfo"
+    @closeDialog="closeDialog">
+
+  </exitFileDetail>
 </div>
 </template>
 
 <script>
+import assetTable from '@/tassetPhyNew/components/assetTable.vue'
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
-import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
-import {commonService} from '../../service/commonService.js'
+import service from '@/api/service.js'
+import exitFileDetail from './detail/exitFileDetail.vue'
 export default {
   data () {
     return {
@@ -138,8 +141,9 @@ export default {
       grantShow: false,
       searchForm: {
       },
-      flowNameOption: commonService.flowNameOption,
-      flowTran: commonService.flowTran
+      dialogVisible: false,
+      dialogTitle: '出门条提醒设置',
+      assetFlowInfo: {}
     }
   },
   mounted () {
@@ -165,29 +169,47 @@ export default {
     },
     // 获取列表数据
     getTableList () {
+      // let params = Object.assign({}, this.searchForm)
+      // if (this.searchForm.start_time[0]) {
+      //   params.minDate = moment(this.searchForm.start_time[0].getTime()).format('YYYY-MM-DD')
+      //   params.maxDate = moment(this.searchForm.start_time[1].getTime()).format('YYYY-MM-DD')
+      // }
       this.loading = true
       let params = {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
         token: this.token,
-        flow_ids: 'f_BianGeng_001,f_BianGeng_002,f_BianGeng_003'
+        index: 't_doorguarder',
+        type: 't_doorguarder'
       }
-      AssetChangeAPI.getMyHandleOrder(params).then(data => {
-        // let data = res.data
+      service.searchDoorList(params).then(data => {
         this.total = data.count
         this.tableList = data.data
       }).finally(() => {
         this.loading = false
       })
     },
+    remind (row) {
+      this.assetFlowInfo = Object.assign({}, row)
+      this.dialogVisible = true
+    },
+    closeDialog () {
+      this.dialogVisible = false
+    },
     // 点击申请更换责任人或部门或两者都换
-    goPath (row) {
-      this.$router.push(`/asset/assetApprove/${row.asset_num}/${row.order_no}/${this.flowTran[row.flow_id]}`)
+    changeAsset (row, type) {
+      this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
+    },
+    importLabel () {
+      this.grantShow = true
+    },
+    handleClose () {
+      this.grantShow = false
     }
   },
   components: {
-    advancedSearch
+    assetTable, advancedSearch, exitFileDetail
   }
 }
 </script>

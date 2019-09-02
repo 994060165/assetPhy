@@ -9,4 +9,8 @@ export class AssetChangeAPI {
   static getMyBackOrder (params) {
     return axios.post(`/flow/index/getMyBackOrder`, params).then(res => res.data)
   }
+  // 分类查询我申请的单据
+  static getMyHandleOrder (params) {
+    return axios.post(`/flow/index/getMyHandleOrder`, params).then(res => res.data)
+  }
 }
