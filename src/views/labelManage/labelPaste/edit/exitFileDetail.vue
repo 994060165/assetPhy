@@ -6,44 +6,29 @@
     :before-close="closeDialog"
     v-loading="loading">
     <el-row>
-      <el-form ref="changeForm" :model="assetFlowInfo" label-width="120px">
+      <el-form ref="changeForm" :model="assetInfo" label-width="120px">
         <el-row class="m-t-20">
           <el-col :span="12">
             <el-form-item label="资产编号：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.asset_num}}
+                {{assetInfo.asset_num}}
               </div>
             </el-form-item>
             <el-form-item label="部门：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.c05}}
-              </div>
-            </el-form-item>
-            <el-form-item label="出门理由：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.c03}}
+                {{assetInfo.deparment}}
               </div>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="资产名称：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.asset_name}}
+                {{assetInfo.name}}
               </div>
             </el-form-item>
-            <!-- <el-form-item label="责任人：">
+            <el-form-item label="责任人：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.zzr_name}}
-              </div>
-            </el-form-item> -->
-            <el-form-item label="去向地点：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.c04}}
-              </div>
-            </el-form-item>
-            <el-form-item label="预计回归日期：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.c08 | moment}}
+                {{assetInfo.zzr_name}}
               </div>
             </el-form-item>
           </el-col>
@@ -91,13 +76,13 @@ export default {
       type: Boolean,
       default: false
     },
-    assetFlowInfo: {
+    assetInfo: {
       type: Object,
       default: {}
     },
     dialogTitle: {
       type: String,
-      default: '出门条提醒设置'
+      default: '贴签提醒'
     }
   },
   data () {

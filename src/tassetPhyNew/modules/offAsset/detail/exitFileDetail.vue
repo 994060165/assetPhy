@@ -16,7 +16,7 @@
             </el-form-item>
             <el-form-item label="部门：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.c05}}
+                {{assetFlowInfo.deparment}}
               </div>
             </el-form-item>
             <el-form-item label="出门理由：">
@@ -24,26 +24,26 @@
                 {{assetFlowInfo.c03}}
               </div>
             </el-form-item>
+            <el-form-item label="预计回归日期：">
+              <div class="panelBody" style="width: 100%;">
+                {{assetFlowInfo.c08}}
+              </div>
+            </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="资产名称：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.asset_name}}
+                {{assetFlowInfo.name}}
               </div>
             </el-form-item>
-            <!-- <el-form-item label="责任人：">
+            <el-form-item label="责任人：">
               <div class="panelBody" style="width: 100%;">
                 {{assetFlowInfo.zzr_name}}
               </div>
-            </el-form-item> -->
+            </el-form-item>
             <el-form-item label="去向地点：">
               <div class="panelBody" style="width: 100%;">
                 {{assetFlowInfo.c04}}
-              </div>
-            </el-form-item>
-            <el-form-item label="预计回归日期：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.c08 | moment}}
               </div>
             </el-form-item>
           </el-col>

@@ -4,14 +4,14 @@
     <div class="datagrid__action">
         <slot name="action"></slot>
         <el-button type="primary" v-if="searchForm" @click="formShow = !formShow"><i :class="formShow?'el-icon-arrow-down':'el-icon-arrow-left'"></i>高级</el-button>
-      
+        
     </div>
   </el-row>
   <el-row v-if="searchForm">
     <el-form ref="searchForm" label-width="100px" :model="searchForm"  v-show="formShow">
       <slot name="form"></slot>
       <el-row class="text-right">
-        <el-button type="primary" @click="handleSearch">筛选</el-button>
+        <el-button  type="primary" @click="handleSearch">筛选</el-button>
       </el-row>
     </el-form>
   </el-row>
@@ -22,6 +22,9 @@
   </el-row>
   <el-row v-if="paging && table.data.length > 0">
     <el-pagination :layout="page.layout" :current-page="page.currentPage" :page-size="page.pageSize" :total="page.total" @current-change="handleCurrentChange"></el-pagination>
+  </el-row>
+  <el-row class="p-t-20" v-if="showFileBtn">
+    <el-button class="text-left" type="success" :loading="downLoading" @click="downFile">导出</el-button>
   </el-row>
 </div>
 </template>
@@ -42,6 +45,10 @@ export default {
     tableData: {
       type: Array,
       required: false
+    },
+    showFileBtn: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -71,7 +78,8 @@ export default {
         currentPage: 1,
         pageSize: 10,
         layout: 'total, ->, prev, pager, next'
-      }
+      },
+      downLoading: false
     }
   },
   methods: {
@@ -93,6 +101,9 @@ export default {
       this.table.loading = true
       this.page.currentPage = 1
       this.$emit('handleSearch', true)
+    },
+    downFile () {
+      this.$emit('downFile')
     }
   }
 }

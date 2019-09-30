@@ -7,9 +7,9 @@
   </el-row>
   <el-row class="interval"></el-row>
   <el-row class="padding-10 text-right">
-    <!-- <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
+    <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
-    </el-input> -->
+    </el-input>
     <!-- 高级搜索 -->
     <!-- <advancedSearch
       :searchPlaceholder="searchPlaceholder"
@@ -60,51 +60,61 @@
         </div>
     </advancedSearch>   -->
   </el-row>
-  <el-row class="text-center">
+  <!-- <el-row class="text-center">
     <el-radio-group v-model="tabs" @change="changeTab">
       <el-radio-button label="pending">待审批</el-radio-button>
       <el-radio-button label="processing">已审批</el-radio-button>
     </el-radio-group>
-  </el-row>
+  </el-row> -->
   <el-row class="padding-10" v-loading="loading">
     <el-table :data="tableList" v-if="tabs === 'pending'">
         <el-table-column type="index" label="序号" width="80"></el-table-column>
         <el-table-column prop="asset_num" label="资产编码">
         </el-table-column>
         <el-table-column 
-          prop="name" 
+          prop="asset_name" 
           label="资产名称">
         </el-table-column>
         <el-table-column
-          prop="zrr_name" 
+          prop="create_user" 
           show-overflow-tooltip 
           label="申请人">
         </el-table-column>
         <el-table-column label="申请日期">
           <template slot-scope="scope">
-            {{scope.row.start_time | moment}}
+            {{scope.row.create_date | moment}}
           </template>
         </el-table-column>
-        <el-table-column 
-          prop="deparment" 
-          show-overflow-tooltip 
-          label="出门理由">
-        </el-table-column>
-        <el-table-column
-          prop="deparment"
-          show-overflow-tooltip 
-          label="去向地点">
-        </el-table-column>
         <el-table-column
           show-overflow-tooltip 
-          label="预计回归日期">
+          label="申请类型">
+          <template slot-scope="scope">
+          <span>{{flowNameOption[scope.row.flow_id]}}</span>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column
+          show-overflow-tooltip 
+          label="归还日期">
             <template slot-scope="scope">
-              {{scope.row.start_time | moment}}
+              {{scope.row.create_date | moment}}
             </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" width="100">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" icon="el-icon-edit" @click="goPath(scope.row)"></el-button>
+            <el-button
+              type="success" 
+              size="mini" 
+              title="查看流程" 
+              icon="el-icon-view" 
+              @click="viewStep(scope.row)">
+            </el-button>
+            <el-button
+              type="primary"
+              size="mini" 
+              title="审批" 
+              icon="el-icon-edit" 
+              @click="goPath(scope.row)">
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -118,17 +128,6 @@
         </el-pagination>
       </el-row>
   </el-row>
-      <el-row>
-        <el-upload class="upload-demo" ref="upload" 
-            action="" 
-            :multiple="false"
-            :before-upload="beforeUpload"
-            :file-list="fileList" 
-            :auto-upload="false">
-          <el-button slot="trigger" type="primary">选取文件</el-button>
-        </el-upload>
-        <el-button @click="submit">上传</el-button>
-      </el-row>
   <exitFileDetail
     v-if="dialogVisible"
     :dialogVisible="dialogVisible"
@@ -137,21 +136,27 @@
     @closeDialog="closeDialog">
 
   </exitFileDetail>
+  
+  <flowStepDialog
+    v-if="viewDialogVisible"
+    :dialogVisible="viewDialogVisible"
+    :orderNo="orderNum"
+    @closeDialog="closeStepDialog">
+  </flowStepDialog>
 </div>
 </template>
 
 <script>
 import assetTable from '@/tassetPhyNew/components/assetTable.vue'
 import advancedSearch from '@/components/advancedSearch.vue'
+import flowStepDialog from '@/components/flowStepDialog.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
-import exitFileDetail from './detail/exitFileDetail.vue'
 import {commonService} from '../../service/commonService.js'
-import {imgToBase64} from '@/service/ocr.js'
+import exitFileDetail from './detail/exitFileDetail.vue'
 export default {
   data () {
     return {
-      fileList: [],
       searchStyle: 'width: auto;max-width: 294px;', // 高级搜索组件的input样式
       searchPlaceholder: '请输入查询内容', // 搜索框的默认
       keystr: '',
@@ -172,20 +177,15 @@ export default {
       assetFlowInfo: {},
       tabs: 'pending',
       flowNameOption: commonService.flowNameOption,
-      flowTran: commonService.flowTran
+      flowTran: commonService.flowTran,
+      viewDialogVisible: false,
+      orderNum: ''
     }
   },
   mounted () {
     this.getTableList()
   },
   methods: {
-    submit () {
-      this.$refs.upload.submit()
-    },
-    beforeUpload (file) {
-      let result = imgToBase64(file)
-      console.log(result)
-    },
     goBack () {
       this.$router.go(-1)
     },
@@ -215,10 +215,10 @@ export default {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
+        flow_ids: 'f_ChuMen_001,f_ChuMen_002,f_ChuMen_003',
         token: this.token
       }
-      AssetChangeAPI.getMyBackOrder(params).then(res => {
-        let data = res.data
+      AssetChangeAPI.getMyHandleOrder(params).then(data => {
         this.total = data.count
         this.tableList = data.data
       }).finally(() => {
@@ -244,11 +244,20 @@ export default {
     },
     // 点击审批出门条
     goPath (row) {
-      this.$router.push(`/asset/exitFileApprove/${row.asset_num}/${row.order_no}`)
+      this.$router.push(`/asset/exitFileApprove/${row.asset_num}/${row.order_no}/${row.flow_id}`)
+    },
+    // 查看流程
+    viewStep (row) {
+      this.orderNum = row.order_no
+      this.viewDialogVisible = true
+    },
+    closeStepDialog () {
+      this.viewDialogVisible = false
+      this.orderNum = ''
     }
   },
   components: {
-    assetTable, advancedSearch, exitFileDetail
+    assetTable, advancedSearch, exitFileDetail, flowStepDialog
   }
 }
 </script>

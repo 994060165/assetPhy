@@ -2,16 +2,16 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>可用出门条</el-breadcrumb-item>
+      <el-breadcrumb-item>资产退库</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
   <el-row class="padding-10 text-right">
-    <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
+    <!-- <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
-    </el-input>
+    </el-input> -->
     <!-- 高级搜索 -->
-    <!-- <advancedSearch
+    <advancedSearch
       :searchPlaceholder="searchPlaceholder"
       :searchStyle="searchStyle"
       :advance="false"
@@ -27,6 +27,9 @@
                   </el-form-item>
                   <el-form-item label="部门">
                     <el-input v-model="searchForm.deparment" placeholder="请输入部门"></el-input>
+                    <!-- <el-select  filterable clearable>
+                      <el-option v-for="(item, index) in allDeparments" :key="index" :label="item" :value="item"></el-option>
+                    </el-select> -->
                   </el-form-item>
                   <el-form-item label="资产最小价值">
                     <el-input-number v-model="searchForm.minvalue" :min="0" :step="100"></el-input-number>
@@ -38,6 +41,9 @@
                   </el-form-item>
                   <el-form-item label="责任人">
                     <el-input v-model="searchForm.zrr_name" placeholder="请输入人员姓名"></el-input>
+                    <!-- <el-select filterable clearable v-model="searchForm.zrr_name" placeholder="请选择责任人">
+                      <el-option v-for="(item, index) in allPersons" :key="index" :label="item" :value="item"></el-option>
+                    </el-select> -->
                   </el-form-item>
                   <el-form-item label="资产最大价值">
                     <el-input-number v-model="searchForm.maxvalue" :min="0" :step="100"></el-input-number>
@@ -47,6 +53,9 @@
                   <el-form-item label="资产标签号">
                     <el-input v-model="searchForm.tag_num"></el-input>
                   </el-form-item>
+                  <!-- <el-form-item label="父资产名称">
+                    <el-input v-model="searchForm.parent_name"></el-input>
+                  </el-form-item> -->
                   <el-form-item label="启用日期">
                     <el-date-picker v-model="searchForm.start_time" type="daterange" placeholder="选择领用日期范围"></el-date-picker>
                   </el-form-item>
@@ -58,60 +67,22 @@
             <el-button type="primary" @click="getAssetBySearch">筛选</el-button>
           </el-row>
         </div>
-    </advancedSearch>   -->
+    </advancedSearch>  
   </el-row>
   <el-row class="padding-10" v-loading="loading">
-     <el-table :data="tableList">
-        <el-table-column type="index" label="序号" width="80"></el-table-column>
-        <el-table-column prop="asset_num" label="资产编码">
-        </el-table-column>
-        <el-table-column 
-          prop="asset_name" 
-          label="资产名称">
-        </el-table-column>
-        <!-- <el-table-column
-          prop="deparment" 
-          show-overflow-tooltip 
-          label="部门">
-        </el-table-column> -->
-        <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
-        <el-table-column label="申请日期">
-          <template slot-scope="scope">
-            {{scope.row.create_date | moment}}
-          </template>
-        </el-table-column>
-        <!-- <el-table-column 
-          prop="deparment" 
-          show-overflow-tooltip 
-          label="出门理由">
-        </el-table-column>
-        <el-table-column
-          prop="deparment"
-          show-overflow-tooltip 
-          label="去向地点">
-        </el-table-column>
-        <el-table-column
-          show-overflow-tooltip 
-          label="预计回归日期">
-            <template slot-scope="scope">
-              {{scope.row.start_time | moment}}
-            </template>
-        </el-table-column> -->
-        <!-- <el-table-column
-          width="80"
-          show-overflow-tooltip 
-          label="授权">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                icon="el-icon-share"
-                title="授权"
-                type="success"
-                @click="remind(scope.row)">
-              </el-button>
-            </template>
-        </el-table-column> -->
-      </el-table>
+    <assetTable
+      :tableList="tableList">
+      <el-table-column label="操作" width="120" slot="handle">
+        <template slot-scope="scope">
+          <el-button
+            size="mini" 
+            icon="el-icon-setting"
+            title="退库"
+            type="warning" 
+            @click="backOff(scope.row)"></el-button>
+        </template>
+      </el-table-column>
+    </assetTable>
   </el-row>
   <el-row class="padding-10 text-right">
     <el-pagination
@@ -122,15 +93,6 @@
       :total="total">
     </el-pagination>
   </el-row>
-  
-    <searchUserDialog
-      :OrgID="org.OrgID"
-      :dialogVisible="userDialogVisible"
-      :dialogTitle="dialogTitle"
-      v-if="userDialogVisible"
-      @addSuccess="addMember"
-      @addCancel="addCancel">
-    </searchUserDialog>
 </div>
 </template>
 
@@ -138,10 +100,7 @@
 import assetTable from '@/tassetPhyNew/components/assetTable.vue'
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
-import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
-import {commonService} from '../../service/commonService.js'
-import exitFileDetail from './detail/exitFileDetail.vue'
-import searchUserDialog from '@/components/sysSelectPeople.vue'
+import service from '@/api/service.js'
 export default {
   data () {
     return {
@@ -159,13 +118,7 @@ export default {
       token: TokenAPI.getToken(),
       grantShow: false,
       searchForm: {
-      },
-      assetFlowInfo: {},
-      userDialogVisible: false,
-      dialogTitle: '选择人员',
-      org: TokenAPI.getOrg(),
-      checkRow: {},
-      flowNameOption: commonService.flowNameOption
+      }
     }
   },
   mounted () {
@@ -201,79 +154,18 @@ export default {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
-        token: this.token,
-        flow_ids: 'f_ChuMen_001'
+        token: this.token
       }
-      AssetChangeAPI.getCanUseOutOrder(params).then(data => {
-        if (data.ID === '-1') {
-          this.$message({
-            type: 'message',
-            message: `${data.msg}`
-          })
-        } else {
-          this.total = data.count
-          this.tableList = data.data
-        }
+      service.getassetlikeZRR(params).then(data => {
+        this.total = data.count
+        this.tableList = data.data
       }).finally(() => {
         this.loading = false
       })
     },
-    remind (row) {
-      this.userDialogVisible = true
-      this.checkRow = row
-    },
-    addMember (persons) {
-      if (persons.length > 0) {
-        let userIDList = ''
-        let userNameList = ''
-        persons.forEach(value => {
-          userIDList += `${value.UserID},`
-          userNameList += `${value.UserName},`
-        })
-        userIDList = userIDList.substring(0, userIDList.length - 1)
-        userNameList = userNameList.substring(0, userNameList.length - 1)
-        this.$confirm(`是否将此出门条授权给${userNameList}`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'success'
-        }).then(() => {
-          this.loading = true
-          let params = {
-            token: this.token,
-            asset_num: this.checkRow.asset_num,
-            user_list: userIDList
-          }
-          AssetChangeAPI.grantOthers(params).then(data => {
-            if (data.ID === '1') {
-              this.$message({
-                type: 'success',
-                message: `${data.msg}`
-              })
-            } else {
-              this.$message({
-                type: 'warning',
-                message: `${data.msg}`
-              })
-            }
-          }).finally(() => {
-            this.loading = false
-            this.checkRow = {}
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
-        })
-      }
-      this.addCancel()
-    },
-    addCancel () {
-      this.userDialogVisible = false
-    },
     // 点击申请更换责任人或部门或两者都换
-    changeAsset (row, type) {
-      this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
+    backOff (row, type) {
+      this.$router.push(`/asset/offAsset/${row.asset_num}/${type}`)
     },
     importLabel () {
       this.grantShow = true
@@ -283,7 +175,7 @@ export default {
     }
   },
   components: {
-    assetTable, advancedSearch, exitFileDetail, searchUserDialog
+    assetTable, advancedSearch
   }
 }
 </script>

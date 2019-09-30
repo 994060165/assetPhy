@@ -1,19 +1,18 @@
 <template>
 <div class="asset-tpl">
-  <el-row class="m-t-20 p-l-10">
+  <!-- <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>标签</el-breadcrumb-item>
       <el-breadcrumb-item><span class="color-blue">发放标签</span> </el-breadcrumb-item>
     </el-breadcrumb>
-  </el-row>
-  <!-- <el-row class="interval"></el-row> -->
-  <el-row class="padding-10 text-left headerTitle">
-    <!-- <el-button type="primary" @click="goBack">返回</el-button> -->
-    <el-button type="primary" @click="importLabel">导入</el-button>
-  </el-row>
-  <el-row class="interval"></el-row>
-  <el-row class="padding-10 text-right">
-    <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
+  </el-row> -->
+  <el-row class="padding-10  text-right">
+    <el-button type="primary" @click="goBack">返回</el-button>
+    <el-button type="success" @click="uploadAlls">导入标签</el-button>
+    <el-input 
+      class="w-400"
+      placeholder="请输入资产名称/资产编码/责任部门/责任人"
+      v-model="keystr" @keyup.enter.native="handleEnterPageone">
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
     </el-input>
   </el-row>
@@ -22,19 +21,19 @@
       :tableList="tableList">
       <el-table-column label="标签领用人" width="120" align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.status}}</span>
+          <span>{{scope.row.receiver}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="领取时间" width="120" align="center" slot="handle">
+      <el-table-column label="领取时间"  align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.status}}</span>
+          <span>{{scope.row.receivedate}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120" slot="handle">
+      <!-- <el-table-column label="操作" width="120" slot="handle">
         <template slot-scope="scope">
           <el-button size="mini" icon="el-icon-edit" title="操作" type="success" @click="changeCheckLabel(scope.row)"></el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </assetTable>
   </el-row>
   <el-row class="padding-10 text-right">
@@ -46,15 +45,15 @@
       :total="total">
     </el-pagination>
   </el-row>
-  <el-row>
-    <labelGrant
-      v-if="grantShow"
-      :formVisible="grantShow"
-      tableTitle="标签发放情况导入"
-      @handleClose="handleClose">
-
-    </labelGrant>
-  </el-row>
+  <uploadFileDialog
+    :formVisible="uploadFileVisible"
+    :tableTitle="uploadFileTitle"
+    :downPath="downPath"
+    :templateName="templateName"
+    :uploadUrl="uploadUrl"
+    @handleClose="handleClose"
+    @uploadSuccess="uploadSuccess">
+  </uploadFileDialog>
 </div>
 </template>
 
@@ -62,6 +61,7 @@
 import assetTable from './assetTable.vue'
 import labelGrant from './edit/labelGrant.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
+import uploadFileDialog from '@/components/uploadFileDialog.vue'
 import service from '@/api/service.js'
 export default {
   data () {
@@ -76,7 +76,16 @@ export default {
       total: 0,
       loading: false,
       token: TokenAPI.getToken(),
-      grantShow: false
+      // 文件上传控制
+      uploadFileVisible: false,
+      // 模块标题
+      uploadFileTitle: '标签发放文件导入',
+      // 模板下载路径
+      // downPath: '上传贴签完成情况模板.xlsx',
+      downPath: '发放标签模板.xlsx',
+      // 下载的模板的文件名称
+      templateName: '',
+      uploadUrl: '/res/index/uploadAssetLabel'
     }
   },
   mounted () {
@@ -116,15 +125,19 @@ export default {
     changeCheckLabel (row) {
       this.$router.push(`/changeCheckLabel/${row.asset_num}`)
     },
-    importLabel () {
-      this.grantShow = true
+    uploadAlls () {
+      this.uploadFileVisible = true
     },
     handleClose () {
-      this.grantShow = false
+      this.uploadFileVisible = false
+    },
+    uploadSuccess (resData) {
+      this.handleClose()
+      console.log(resData)
     }
   },
   components: {
-    assetTable, labelGrant
+    assetTable, labelGrant, uploadFileDialog
   }
 }
 </script>

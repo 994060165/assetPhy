@@ -1,33 +1,37 @@
 <template>
 <div class="asset-tpl">
-  <el-row class="interval p-l-10 p-b-10">
+  <!-- <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>标签</el-breadcrumb-item>
-      <el-breadcrumb-item><span class="color-blue">粘贴标签</span> </el-breadcrumb-item>
+      <el-breadcrumb-item><span class="color-blue">发放标签</span> </el-breadcrumb-item>
     </el-breadcrumb>
-  </el-row>
-  <!-- <el-row class="interval"></el-row> -->
-  <el-row class="padding-10 text-left headerTitle">
+  </el-row> -->
+  <el-row class="padding-10  text-right">
     <el-button type="primary" @click="goBack">返回</el-button>
-    <el-button type="primary" @click="importLabel">批量导入</el-button>
-  </el-row>
-  <el-row class="interval"></el-row>
-  <el-row class="padding-10 text-right">
-    <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
+    <el-button type="success" @click="uploadAlls">导入粘贴标签完成情况</el-button>
+    <el-input 
+      class="w-400"
+      placeholder="请输入资产名称/资产编码/责任部门/责任人"
+      v-model="keystr" @keyup.enter.native="handleEnterPageone">
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
     </el-input>
   </el-row>
   <el-row class="padding-10" v-loading="loading">
     <assetTable
       :tableList="tableList">
-      <el-table-column label="标签粘贴" width="120" align="center" slot="handle">
+      <el-table-column label="标签领用人" width="120" align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.status}}</span>
+          <span>{{scope.row.receiver}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120" slot="handle">
+      <el-table-column label="领取时间"  align="center" slot="handle">
         <template slot-scope="scope">
-          <el-button size="mini" icon="el-icon-edit" title="更换标签" type="success" @click="changeCheckLabel(scope.row)"></el-button>
+          <span>{{scope.row.receivedate}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="提醒" width="120" slot="handle">
+        <template slot-scope="scope">
+          <el-button size="mini" icon="el-icon-edit" title="操作" type="success" @click="changeCheckLabel(scope.row)"></el-button>
         </template>
       </el-table-column>
     </assetTable>
@@ -41,12 +45,29 @@
       :total="total">
     </el-pagination>
   </el-row>
+  <uploadFileDialog
+    :formVisible="uploadFileVisible"
+    :tableTitle="uploadFileTitle"
+    :downPath="downPath"
+    :templateName="templateName"
+    :uploadUrl="uploadUrl"
+    @handleClose="handleClose"
+    @uploadSuccess="uploadSuccess">
+  </uploadFileDialog>
+  <exitFileDetail
+  :dialogVisible="remindVisible"
+  :assetInfo="assetInfo"
+  @closeDialog="closeRemindDialog">
+  </exitFileDetail>
 </div>
 </template>
 
 <script>
 import assetTable from './assetTable.vue'
+// import labelGrant from './edit/labelGrant.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
+import uploadFileDialog from '@/components/uploadFileDialog.vue'
+import exitFileDetail from './edit/exitFileDetail.vue'
 import service from '@/api/service.js'
 export default {
   data () {
@@ -60,13 +81,28 @@ export default {
       pagesize: 10,
       total: 0,
       loading: false,
-      token: TokenAPI.getToken()
+      token: TokenAPI.getToken(),
+      // 文件上传控制
+      uploadFileVisible: false,
+      // 模块标题
+      uploadFileTitle: '粘贴标签完成情况文件导入',
+      // 模板下载路径
+      // downPath: '上传贴签完成情况模板.xlsx',
+      downPath: '上传贴签完成情况模板.xlsx',
+      // 下载的模板的文件名称
+      templateName: '',
+      uploadUrl: '/res/index/uploadpastelabelexcel',
+      remindVisible: false,
+      assetInfo: []
     }
   },
   mounted () {
     this.getTableList()
   },
   methods: {
+    goBack () {
+      this.$router.go(-1)
+    },
     // 查询 页码归一
     handleEnterPageone () {
       this.page = 1
@@ -93,16 +129,28 @@ export default {
         this.loading = false
       })
     },
-    // 点击申请更换标签
+    // 点击设置提醒频率
     changeCheckLabel (row) {
-      this.$router.push(`/changeCheckLabel/${row.asset_num}`)
+      this.remindVisible = true
+      this.assetInfo.push(row)
     },
-    importLabel () {
-
+    closeRemind () {
+      this.remindVisible = false
+      this.assetInfo = []
+    },
+    uploadAlls () {
+      this.uploadFileVisible = true
+    },
+    handleClose () {
+      this.uploadFileVisible = false
+    },
+    uploadSuccess (resData) {
+      this.handleClose()
+      console.log(resData)
     }
   },
   components: {
-    assetTable
+    assetTable, uploadFileDialog, exitFileDetail
   }
 }
 </script>

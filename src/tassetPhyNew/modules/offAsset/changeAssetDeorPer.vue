@@ -18,20 +18,15 @@
       </div>
       <el-row class="interval"></el-row>
       <div class="padding-10">
-        <div class="">
-          出门流程
-        </div>
-        <flowStep
-          v-if="flowStepVisible"
-          :orderNo="orderNum">
-        </flowStep>
-      </div>
-      <el-row class="interval"></el-row>
-      <div class="padding-10">
+        <assetChangeEdit
+          ref="changeForm"
+          :type="type"
+          v-if="dataLoad"
+          :changeInfo="changeInfo">
+        </assetChangeEdit>
         <el-row class="padding-10 text-left headerTitle" id="create_protect_top">
-          <el-button type="primary" @click="goBack">返回</el-button>
-          <el-button type="danger" @click="reject">驳回</el-button>
-          <el-button type="success" @click="submit('1')">同意</el-button>
+          <el-button type="primary" @click="goBack">取消</el-button>
+          <el-button type="primary" @click="submit">提交</el-button>
         </el-row>
       </div>
     </el-collapse>
@@ -41,14 +36,12 @@
 <script>
 import moment from 'moment'
 import fixarea from '@/components/fixarea.vue'
-import flowStep from '@/components/flowStep.vue'
 import assetInfoDetail from '../../components/detail/assetInfo.vue'
 import assetImgDetail from '../../components/detail/assetImg.vue'
-import assetChangeDetail from './detail/assetChangeDetail.vue'
-import {commonService} from '../../service/commonService.js'
+import assetChangeEdit from './edit/assetChangeEdit.vue'
+import {commonService} from './service/commonService.js'
 import {TokenAPI} from '@/request/TokenAPI'
-// import {AssetChangeAPI} from './service/assetChangeAPI.js'
-import {FlowAPI} from '@/api/flowAPI.js'
+import {AssetChangeAPI} from './service/assetChangeAPI.js'
 import api from '@/api'
 export default {
   data () {
@@ -59,17 +52,17 @@ export default {
       dataLoad: false,
       loading: false,
       assetNum: '',
-      orderNum: '',
       activeNames: ['1', '2', '3'],
-      assetFlowInfo: {},
+      changeInfo: {
+        userList: [],
+        deptList: []
+      },
       type: 'person',
-      flowStepVisible: false,
       flow: commonService.changeFlow
     }
   },
   mounted () {
     this.assetNum = this.$route.params.assetNum
-    this.orderNum = this.$route.params.orderNum
     this.type = this.$route.params.type
     this.getAssetInfo()
   },
@@ -80,7 +73,6 @@ export default {
     },
     // 获取资产信息
     getAssetInfo () {
-      this.flowStepVisible = true
       this.loading = true
       let params = {
         asset_num: this.assetNum,
@@ -90,59 +82,75 @@ export default {
         console.log('data', data)
         this.assetInfo = data.data[0]
       }).finally(() => {
-        this.getFlowInfo()
-      })
-    },
-    getFlowInfo () {
-      let params = {
-        token: this.token,
-        order_no: this.orderNum
-      }
-      FlowAPI.getOrderInfo(params).then(data => {
-        if (data.orderaction) {
-          this.assetFlowInfo = data.orderaction.act01
-        }
-      }).finally(() => {
         this.dataLoad = true
         this.loading = false
       })
     },
-    // 驳回
-    reject () {
-      this.$confirm('是否驳回?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.submit('0')
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消操作'
-        })
-      })
-    },
     // 提交
-    submit (type) {
-      let params = {
-        token: this.token,
-        'order_no': this.orderNum,
-        'result_tag': type
-      }
-      console.log('params', params)
-      FlowAPI.handleOutOrder(params).then(data => {
-        if (data.ID === '-1') {
-          this.errMsg('审核失败')
-        } else {
-          this.$message({
-            type: 'success',
-            message: '提交成功！'
+    submit () {
+      console.log('changeInfo', this.changeInfo)
+      let isValid = this.validateForm(['changeForm'])
+      if (isValid) {
+        let judge = this.judgeObj()
+        if (judge) {
+          let params = {
+            token: this.token,
+            'asset_num': this.assetNum,
+            'flow_id': this.flow[this.type],
+            c01: this.changeInfo.userList[0] ? this.changeInfo.userList[0].UserID : '',
+            c02: this.changeInfo.deptList[0] ? this.changeInfo.deptList[0].OrgID : '',
+            c03: this.changeInfo.explain
+          }
+          console.log('params', params)
+          AssetChangeAPI.setChangeDeporPer(params).then(data => {
+            if (data.result === '-1') {
+              this.$message({
+                type: 'error',
+                message: '提交失败！'
+              })
+            } else {
+              this.$message({
+                type: 'success',
+                message: '提交成功！'
+              })
+              this.goBack()
+            }
+          }, () => {
+            this.$message({
+              type: 'error',
+              message: `网络原因，提交失败！`
+            })
           })
-          this.goBack()
         }
-      }, () => {
-        this.errMsg('审核失败')
-      })
+      }
+    },
+    judgeObj () {
+      let userList = this.changeInfo.userList
+      let deptList = this.changeInfo.deptList
+      let judge = false
+      if (this.type === 'person') {
+        if (userList.length > 0) {
+          judge = true
+        } else {
+          this.errMsg('请您选则一个责任人！')
+          return false
+        }
+      } else if (this.type === 'dept') {
+        if (deptList.length > 0) {
+          judge = true
+        } else {
+          this.errMsg('请您选则部门！')
+          return false
+        }
+      } else {
+        if (userList.length > 0 && deptList.length > 0) {
+          judge = true
+        } else {
+          this.errMsg('请您选中要变更部门和人员！')
+          return false
+        }
+      }
+      return judge
     },
     errMsg (msg) {
       this.$message({
@@ -164,7 +172,7 @@ export default {
     }
   },
   components: {
-    assetInfoDetail, assetImgDetail, assetChangeDetail, fixarea, flowStep
+    assetInfoDetail, assetImgDetail, assetChangeEdit, fixarea
   }
 }
 </script>

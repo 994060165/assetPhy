@@ -30,4 +30,18 @@ const remindTypes = [
     label: '短信'
   }
 ]
-export {remindOptions, remindTypes}
+const limitTypes = [
+  {
+    value: 'information',
+    label: '消息'
+  },
+  {
+    value: 'mail',
+    label: '邮箱'
+  },
+  {
+    value: 'message',
+    label: '短信'
+  }
+]
+export {remindOptions, remindTypes, limitTypes}

@@ -24,38 +24,22 @@
     <el-row>
       <el-collapse v-model="collapseActiveName">
         <el-collapse-item title="资产图片" name="1">
-          <el-row :gutter="10">
-            <!-- <el-col :span="6">
+          <el-row :gutter="10" v-if="showImgVisible">
+            <el-col :span="6">
               <div class="text-center">标签与铭牌合照</div>
-              <img :src="`/${type}/${imgs.img_bq}`" alt="" class="w-full" @click="showImgPlus('img_bq')">
+              <img :src="`/${type}/${imgs.img_bq}`" alt="" v-if="!!!imgs.img_bq" class="w-full" @click="showImgPlus('img_bq')">
             </el-col>
             <el-col :span="6">
               <div class="text-center">标签与局部合照</div>
-              <img :src="`/${type}/${imgs.img_jb}`" alt="" class="w-full" @click="showImgPlus('img_jb')">
+              <img :src="`/${type}/${imgs.img_jb}`" alt="" v-if="!!!imgs.img_jb" class="w-full" @click="showImgPlus('img_jb')">
             </el-col>
             <el-col :span="6">
               <div class="text-center">资产正面整体照片</div>
-              <img :src="`/${type}/${imgs.img_zt}`" alt="" class="w-full" @click="showImgPlus('img_zt')">
+              <img :src="`/${type}/${imgs.img_zt}`" alt="" v-if="!!!imgs.img_zt" class="w-full" @click="showImgPlus('img_zt')">
             </el-col>
             <el-col :span="6">
               <div class="text-center"> 其他照片</div>
-              <img :src="`/${type}/${imgs.img_qt}`" alt="" class="w-full" @click="showImgPlus('img_qt')">
-            </el-col> -->
-            <el-col :span="6">
-              <div class="text-center">标签与铭牌合照</div>
-              <img :src="imgs.img_bq" alt="" class="w-full" @click="showImgPlus('img_bq')">
-            </el-col>
-            <el-col :span="6">
-              <div class="text-center">标签与局部合照</div>
-              <img :src="imgs.img_jb" alt="" class="w-full" @click="showImgPlus('img_jb')">
-            </el-col>
-            <el-col :span="6">
-              <div class="text-center">资产正面整体照片</div>
-              <img :src="imgs.img_zt" alt="" class="w-full" @click="showImgPlus('img_zt')">
-            </el-col>
-            <el-col :span="6">
-              <div class="text-center"> 其他照片</div>
-              <img :src="imgs.img_qt" alt="" class="w-full" @click="showImgPlus('img_qt')">
+              <img :src="`/${type}/${imgs.img_qt}`" alt="" v-if="!!!imgs.img_qt" class="w-full" @click="showImgPlus('img_qt')">
             </el-col>
           </el-row>
         </el-collapse-item>
@@ -109,7 +93,8 @@ export default {
       type: type,
       imgPlus: null,
       imgVisible: false,
-      assetImgs: {}
+      assetImgs: {},
+      showImgVisible: false
     }
   },
   mounted () {
@@ -118,9 +103,8 @@ export default {
   computed: {
   },
   methods: {
-    getAssetImg (img) {
-      // this.imgVisible = true
-      console.log(this.asset)
+    getAssetImg () {
+      console.log('.....')
       let params = {
         asset_id: this.asset.asset_id,
         asset_num: this.asset.asset_num,
@@ -133,12 +117,14 @@ export default {
             message: `${data.msg}`
           })
         } else {
-          this.assetImgs = data
+          this.showImgVisible = true
+          this.imgs = data
           // this.imgVisible = true
         }
       })
     },
     handleClose () {
+      this.showImgVisible = false
       this.asset = {}
       this.collapseActiveName = '1'
       this.$emit('closeDialog')

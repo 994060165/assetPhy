@@ -1,6 +1,7 @@
 <template>
   <div v-loading="loading">
     <el-row class="padding-10  text-right">
+      <!-- <el-button @click="uploadAlls" type="success">批量导入</el-button> -->
       <el-button @click="viewAssets" type="primary">预览({{selectSize}})</el-button>
       <el-button @click="auditAll('驳回')" type="danger">批量回退</el-button>
       <el-button @click="auditAll('已绑定')" type="primary">批量通过</el-button>
@@ -83,12 +84,21 @@
     :imgs="imgs"
     @closeDialog="closeImgDialog">
   </detail>
+  <uploadFileDialog
+    :formVisible="uploadFileVisible"
+    :tableTitle="uploadFileTitle"
+    :downPath="downPath"
+    :templateName="templateName"
+    @handleClose="handleClose"
+    @uploadSuccess="uploadSuccess">
+  </uploadFileDialog>
   </div>
 </template>
 
 <script>
 import {TokenAPI} from '@/request/TokenAPI'
 import detail from '@/components/asset/detail.vue'
+import uploadFileDialog from '@/components/uploadFileDialog.vue'
 import api from '@/api'
 export default {
   props: {
@@ -123,7 +133,15 @@ export default {
       visible: false,
       imgs: {},
       assetid: '',
-      assetnum: ''
+      assetnum: '',
+      // 文件上传控制
+      uploadFileVisible: false,
+      // 模块标题
+      uploadFileTitle: '批量导入',
+      // 模板下载路径
+      downPath: '',
+      // 下载的模板的文件名称
+      templateName: ''
     }
   },
   mounted () {
@@ -165,7 +183,7 @@ export default {
         asset_num: row.asset_num,
         token: this.token
       }
-      api.getAssetImgToBase64(params).then(data => {
+      api.getAssetImg(params).then(data => {
         if (data.ID === '-1') {
           this.$message({
             type: 'error',
@@ -186,6 +204,7 @@ export default {
       this.visible = false
       this.assetnum = ''
       this.assetid = ''
+      this.imgs = {}
     },
     // 关闭窗口
     closeDialog () {
@@ -371,12 +390,22 @@ export default {
       // } else {
       //   this.handleSearch()
       // }
+    },
+    uploadAlls () {
+      this.uploadFileVisible = true
+    },
+    handleClose () {
+      this.uploadFileVisible = false
+    },
+    uploadSuccess (resData) {
+      this.handleClose()
+      console.log(resData)
     }
   },
   computed: {
   },
   components: {
-    detail
+    detail, uploadFileDialog
   }
 }
 </script>

@@ -6,71 +6,37 @@
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
-  <el-row class="padding-10 text-right">
-    <!-- <el-input class="w-300" v-model="keystr" @keyup.enter.native="handleEnterPageone">
+  <el-row class="padding-10  text-right">
+    <el-button type="primary" @click="goBack">返回</el-button>
+    <el-button type="success" @click="uploadAlls">导入出门记录</el-button>
+    <el-input 
+      class="w-400"
+      placeholder="请输入资产名称/资产编码"
+      v-model="keystr" @keyup.enter.native="handleEnterPageone">
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
-    </el-input> -->
-    <!-- 高级搜索 -->
-    <!-- <advancedSearch
-      :searchPlaceholder="searchPlaceholder"
-      :searchStyle="searchStyle"
-      :advance="false"
-      @search="handleEnterPageone"
-      ref="search">
-        <div slot="search">
-          <el-row>
-            <el-form ref="searchForm" label-width="100px" :model="searchForm">
-              <el-row :gutter="16">
-                <el-col :span="8">
-                  <el-form-item label="资产名称">
-                    <el-input v-model="searchForm.name"></el-input>
-                  </el-form-item>
-                  <el-form-item label="部门">
-                    <el-input v-model="searchForm.deparment" placeholder="请输入部门"></el-input>
-                  </el-form-item>
-                  <el-form-item label="资产最小价值">
-                    <el-input-number v-model="searchForm.minvalue" :min="0" :step="100"></el-input-number>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                  <el-form-item label="资产编码">
-                    <el-input v-model="searchForm.asset_num"></el-input>
-                  </el-form-item>
-                  <el-form-item label="责任人">
-                    <el-input v-model="searchForm.zrr_name" placeholder="请输入人员姓名"></el-input>
-                  </el-form-item>
-                  <el-form-item label="资产最大价值">
-                    <el-input-number v-model="searchForm.maxvalue" :min="0" :step="100"></el-input-number>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                  <el-form-item label="资产标签号">
-                    <el-input v-model="searchForm.tag_num"></el-input>
-                  </el-form-item>
-                  <el-form-item label="启用日期">
-                    <el-date-picker v-model="searchForm.start_time" type="daterange" placeholder="选择领用日期范围"></el-date-picker>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
-          </el-row>
-          <el-row class="text-right">
-            <el-button type="primary" @click="getAssetBySearch">筛选</el-button>
-          </el-row>
-        </div>
-    </advancedSearch>   -->
+    </el-input>
   </el-row>
+  <!-- <el-row class="padding-10 text-right">
+      <advancedSearch
+        :advance="true"
+      >
+        <div slot="search">
+          <el-form label-width="120px">
+          </el-form>
+        </div>
+      </advancedSearch>
+  </el-row> -->
   <el-row class="padding-10" v-loading="loading">
      <el-table :data="tableList">
         <el-table-column type="index" label="序号" width="80"></el-table-column>
         <el-table-column prop="asset_num" label="资产编码">
         </el-table-column>
         <el-table-column 
-          prop="name" 
+          prop="asset_name" 
           label="资产名称">
         </el-table-column>
         <el-table-column
-          prop="deparment" 
+          prop="c05" 
           show-overflow-tooltip 
           label="部门">
         </el-table-column>
@@ -81,12 +47,12 @@
           </template>
         </el-table-column>
         <el-table-column 
-          prop="deparment" 
+          prop="c03" 
           show-overflow-tooltip 
           label="出门理由">
         </el-table-column>
         <el-table-column
-          prop="deparment"
+          prop="c04"
           show-overflow-tooltip 
           label="去向地点">
         </el-table-column>
@@ -94,13 +60,15 @@
           show-overflow-tooltip 
           label="预计回归日期">
             <template slot-scope="scope">
-              {{scope.row.start_time | moment}}
+              {{scope.row.c08 | moment}}
             </template>
         </el-table-column>
-        <el-table-column
-          prop="deparment" 
+        <el-table-column 
           show-overflow-tooltip 
           label="申请类型">
+            <template slot-scope="scope">
+              {{flowNameOption[scope.row.flow_id]}}
+            </template>
         </el-table-column>
         <el-table-column
           width="80"
@@ -135,6 +103,15 @@
     @closeDialog="closeDialog">
 
   </exitFileDetail>
+  <uploadFileDialog
+    :formVisible="uploadFileVisible"
+    :tableTitle="uploadFileTitle"
+    :downPath="downPath"
+    :templateName="templateName"
+    :uploadUrl="uploadUrl"
+    @handleClose="handleClose"
+    @uploadSuccess="uploadSuccess">
+  </uploadFileDialog>
 </div>
 </template>
 
@@ -144,6 +121,8 @@ import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import service from '@/api/service.js'
 import exitFileDetail from './detail/exitFileDetail.vue'
+import uploadFileDialog from './edit/uploadFileDialog.vue'
+import {commonService} from '../../service/commonService.js'
 export default {
   data () {
     return {
@@ -164,7 +143,18 @@ export default {
       },
       dialogVisible: false,
       dialogTitle: '出门条提醒设置',
-      assetFlowInfo: {}
+      assetFlowInfo: {},
+      // 文件上传控制
+      uploadFileVisible: false,
+      // 模块标题
+      uploadFileTitle: '出门情况文件导入',
+      // 模板下载路径
+      // downPath: '上传贴签完成情况模板.xlsx',
+      downPath: '出门条模板.xlsx',
+      // 下载的模板的文件名称
+      templateName: '',
+      uploadUrl: '/flow/index/uploadAllExt',
+      flowNameOption: commonService.flowNameOption
     }
   },
   mounted () {
@@ -200,11 +190,19 @@ export default {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
-        token: this.token
+        token: this.token,
+        flow_ids: 'f_ChuMen_001'
       }
-      service.getassetlikeZRR(params).then(data => {
-        this.total = data.count
-        this.tableList = data.data
+      service.getAllOutOrder(params).then(data => {
+        if (data.ID === '-1') {
+          this.$message({
+            type: 'error',
+            message: '获取出门条信息失败'
+          })
+        } else {
+          this.total = data.count
+          this.tableList = data.data
+        }
       }).finally(() => {
         this.loading = false
       })
@@ -220,15 +218,19 @@ export default {
     changeAsset (row, type) {
       this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
     },
-    importLabel () {
-      this.grantShow = true
+    uploadAlls () {
+      this.uploadFileVisible = true
     },
     handleClose () {
-      this.grantShow = false
+      this.uploadFileVisible = false
+    },
+    uploadSuccess (resData) {
+      this.handleClose()
+      console.log(resData)
     }
   },
   components: {
-    assetTable, advancedSearch, exitFileDetail
+    assetTable, advancedSearch, exitFileDetail, uploadFileDialog
   }
 }
 </script>

@@ -60,7 +60,8 @@
       <el-table-column prop="name" label="资产名称" width="140"></el-table-column>
       <el-table-column label="资产编码" width="140" prop="asset_num">
       </el-table-column>
-      <el-table-column prop="outreason" label="出门受限原因 " show-overflow-tooltip></el-table-column>
+      <el-table-column prop="backreason" label="退库受限原因 " show-overflow-tooltip></el-table-column>
+
       <!-- <el-table-column prop="tag_num" label="资产编号"></el-table-column> -->
       <el-table-column prop="location" label="资产位置"></el-table-column>
       <!-- <el-table-column prop="parent_tag_num" label="父资产标签号"></el-table-column>
@@ -76,7 +77,7 @@
       <el-table-column width="100" label="操作">
         <template slot-scope="scope">
           <el-button @click="seeDetail(scope.row)" title="查看" type="success" size="mini" icon="el-icon-view" ></el-button>
-          <el-button @click="editAsset(scope.row)" title="设置出门受限" type="primary" size="mini" icon="el-icon-edit" ></el-button>
+          <el-button @click="editAsset(scope.row)" title="设置退库" type="primary" size="mini" icon="el-icon-edit" ></el-button>
         </template>
       </el-table-column>
     </template>
@@ -133,7 +134,7 @@ export default {
       assetData: {},
       token: window.sessionStorage.getItem('token'),
       dialogVisible: false,
-      dialogTitle: '设置出门受限资产',
+      dialogTitle: '设置退库受限资产',
       assetFlowInfo: {}
       // token: TokenAPI.getToken()
     }

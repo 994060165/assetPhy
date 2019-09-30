@@ -164,5 +164,8 @@ export default {
   },
   getAssetImgToBase64 (params) {
     return axios.post(`/res/index/getAssetImgToBase64`, params).then(res => res.data)
+  },
+  getassetToExportExcel (params, path) {
+    return axios.post(`/res/index/${path}`, params).then(res => res.data)
   }
 }

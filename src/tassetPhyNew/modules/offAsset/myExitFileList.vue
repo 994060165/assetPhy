@@ -66,21 +66,21 @@
         <el-table-column prop="asset_num" label="资产编码">
         </el-table-column>
         <el-table-column 
-          prop="asset_name" 
+          prop="name" 
           label="资产名称">
         </el-table-column>
-        <!-- <el-table-column
+        <el-table-column
           prop="deparment" 
           show-overflow-tooltip 
           label="部门">
-        </el-table-column> -->
+        </el-table-column>
         <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
         <el-table-column label="申请日期">
           <template slot-scope="scope">
-            {{scope.row.create_date | moment}}
+            {{scope.row.start_time | moment}}
           </template>
         </el-table-column>
-        <!-- <el-table-column 
+        <el-table-column 
           prop="deparment" 
           show-overflow-tooltip 
           label="出门理由">
@@ -96,11 +96,11 @@
             <template slot-scope="scope">
               {{scope.row.start_time | moment}}
             </template>
-        </el-table-column> -->
-        <!-- <el-table-column
+        </el-table-column>
+        <el-table-column
           width="80"
           show-overflow-tooltip 
-          label="授权">
+          label="操作">
             <template slot-scope="scope">
               <el-button
                 size="mini"
@@ -110,7 +110,7 @@
                 @click="remind(scope.row)">
               </el-button>
             </template>
-        </el-table-column> -->
+        </el-table-column>
       </el-table>
   </el-row>
   <el-row class="padding-10 text-right">
@@ -201,19 +201,11 @@ export default {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
-        token: this.token,
-        flow_ids: 'f_ChuMen_001'
+        token: this.token
       }
       AssetChangeAPI.getCanUseOutOrder(params).then(data => {
-        if (data.ID === '-1') {
-          this.$message({
-            type: 'message',
-            message: `${data.msg}`
-          })
-        } else {
-          this.total = data.count
-          this.tableList = data.data
-        }
+        this.total = data.count
+        this.tableList = data.data
       }).finally(() => {
         this.loading = false
       })

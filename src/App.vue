@@ -19,4 +19,13 @@ p{
   -webkit-margin-before: .5em;
   -webkit-margin-after: .5em;
 }
+.el-dialog__headerbtn .el-dialog__close {
+  color: white;
+}
+.el-dialog__headerbtn .el-dialog__close:hover {
+  color: white;
+}
+.el-dialog__header {
+  text-align: center;
+}
 </style>

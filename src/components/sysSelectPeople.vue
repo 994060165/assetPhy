@@ -4,7 +4,7 @@
     width="70%"
     :title="dialogTitle"
     :visible="dialogVisible"
-    :showClose="false">
+    :before-close="handleCancel">
     <el-row class="text-right">
       <el-input
         placeholder="请输入检索关键字"
@@ -57,7 +57,7 @@
         :total="total">
       </el-pagination>
     </el-row>
-    <div class="padding-10 dialog-footer text-right" slot="footer">
+    <div class="padding-10 dialog-footer text-center" slot="footer">
       <div>
         <el-button @click="handleCancel">取 消</el-button>
         <el-button type="primary" @click="handleConfirm">确 定</el-button>
@@ -184,5 +184,13 @@ export default {
 <style lang="css" scoped="scope">
   .member-table {
     text-align: left;
+  }
+</style>
+<style lang="scss">
+  .el-dialog__headerbtn .el-dialog__close {
+    color: white;
+  } 
+  .el-dialog__headerbtn:hover .el-dialog__close{
+    color: white;
   }
 </style>

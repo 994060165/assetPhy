@@ -25,28 +25,8 @@ export class AssetChangeAPI {
   static getAssetIsLimit (params) {
     return axios.post(`/flow/index/getAssetIsLimit`, params).then(res => res.data)
   }
-  // 查询退库受监控资产
-  static getAssetBackLimit (params) {
-    return axios.post(`/flow/index/assetBackLimit`, params).then(res => res.data)
-  }
   // 更新受限字段
   static updateAssetLimitStatus (params) {
     return axios.post(`/flow/index/updateAssetLimitStatus`, params).then(res => res.data)
-  }
-  // 更新退库字段
-  static updateAssetbackLimitStatus (params) {
-    return axios.post(`/flow/index/updateAssetbackLimitStatus`, params).then(res => res.data)
-  }
-  // 查询退库受限资产
-  static getFinishBackAsset (params) {
-    return axios.post(`/flow/index/getFinishBackAsset`, params).then(res => res.data)
-  }
-  // 设置退库受限资产
-  static changeAssetForbidBack (params) {
-    return axios.post(`/flow/index/changeAssetForbidBack`, params).then(res => res.data)
-  }
-  // 设置出门受限资产
-  static changeAssetForbidOut (params) {
-    return axios.post(`/flow/index/changeAssetForbidOut`, params).then(res => res.data)
   }
 }

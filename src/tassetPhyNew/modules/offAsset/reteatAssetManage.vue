@@ -2,7 +2,7 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>可用出门条</el-breadcrumb-item>
+      <el-breadcrumb-item>退库受监控资产</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
@@ -66,51 +66,33 @@
         <el-table-column prop="asset_num" label="资产编码">
         </el-table-column>
         <el-table-column 
-          prop="asset_name" 
+          prop="name" 
           label="资产名称">
         </el-table-column>
-        <!-- <el-table-column
+        <el-table-column
           prop="deparment" 
           show-overflow-tooltip 
           label="部门">
-        </el-table-column> -->
-        <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
-        <el-table-column label="申请日期">
+        </el-table-column>
+        <el-table-column 
+          prop="backreason" 
+          show-overflow-tooltip 
+          label="受限原因">
+        </el-table-column>
+        <el-table-column
+          prop="zrr_name"
+          show-overflow-tooltip 
+          label="责任人">
+        </el-table-column>
+        <el-table-column 
+          width="120"
+          align="center"
+          label="取消受限">
           <template slot-scope="scope">
-            {{scope.row.create_date | moment}}
+            <el-button type="warning" size="mini" icon="el-icon-edit" @click="approveTuiKu(scope.row)"></el-button>
           </template>
         </el-table-column>
-        <!-- <el-table-column 
-          prop="deparment" 
-          show-overflow-tooltip 
-          label="出门理由">
-        </el-table-column>
-        <el-table-column
-          prop="deparment"
-          show-overflow-tooltip 
-          label="去向地点">
-        </el-table-column>
-        <el-table-column
-          show-overflow-tooltip 
-          label="预计回归日期">
-            <template slot-scope="scope">
-              {{scope.row.start_time | moment}}
-            </template>
-        </el-table-column> -->
-        <!-- <el-table-column
-          width="80"
-          show-overflow-tooltip 
-          label="授权">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                icon="el-icon-share"
-                title="授权"
-                type="success"
-                @click="remind(scope.row)">
-              </el-button>
-            </template>
-        </el-table-column> -->
+         
       </el-table>
   </el-row>
   <el-row class="padding-10 text-right">
@@ -122,15 +104,15 @@
       :total="total">
     </el-pagination>
   </el-row>
-  
-    <searchUserDialog
-      :OrgID="org.OrgID"
-      :dialogVisible="userDialogVisible"
-      :dialogTitle="dialogTitle"
-      v-if="userDialogVisible"
-      @addSuccess="addMember"
-      @addCancel="addCancel">
-    </searchUserDialog>
+  <exitAssetApprove
+    v-if="dialogVisible"
+    :dialogVisible="dialogVisible"
+    :dialogTitle="dialogTitle"
+    :assetFlowInfo="assetFlowInfo"
+    @closeDialog="closeDialog"
+    @uploadSuccess="uploadSuccess">
+
+  </exitAssetApprove>
 </div>
 </template>
 
@@ -139,9 +121,7 @@ import assetTable from '@/tassetPhyNew/components/assetTable.vue'
 import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import {AssetChangeAPI} from '../../service/assetChangeAPI.js'
-import {commonService} from '../../service/commonService.js'
-import exitFileDetail from './detail/exitFileDetail.vue'
-import searchUserDialog from '@/components/sysSelectPeople.vue'
+import exitAssetApprove from './edit/exitAssetApprove.vue'
 export default {
   data () {
     return {
@@ -160,12 +140,10 @@ export default {
       grantShow: false,
       searchForm: {
       },
-      assetFlowInfo: {},
-      userDialogVisible: false,
-      dialogTitle: '选择人员',
-      org: TokenAPI.getOrg(),
-      checkRow: {},
-      flowNameOption: commonService.flowNameOption
+      assetNum: '',
+      dialogVisible: false,
+      dialogTitle: '退库限制资产申请退库',
+      assetFlowInfo: {}
     }
   },
   mounted () {
@@ -201,89 +179,29 @@ export default {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
-        token: this.token,
-        flow_ids: 'f_ChuMen_001'
+        token: this.token
       }
-      AssetChangeAPI.getCanUseOutOrder(params).then(data => {
-        if (data.ID === '-1') {
-          this.$message({
-            type: 'message',
-            message: `${data.msg}`
-          })
-        } else {
-          this.total = data.count
-          this.tableList = data.data
-        }
+      AssetChangeAPI.getAssetBackLimit(params).then(data => {
+        this.total = data.count
+        this.tableList = data.data
       }).finally(() => {
         this.loading = false
       })
     },
-    remind (row) {
-      this.userDialogVisible = true
-      this.checkRow = row
+    closeDialog () {
+      this.dialogVisible = false
     },
-    addMember (persons) {
-      if (persons.length > 0) {
-        let userIDList = ''
-        let userNameList = ''
-        persons.forEach(value => {
-          userIDList += `${value.UserID},`
-          userNameList += `${value.UserName},`
-        })
-        userIDList = userIDList.substring(0, userIDList.length - 1)
-        userNameList = userNameList.substring(0, userNameList.length - 1)
-        this.$confirm(`是否将此出门条授权给${userNameList}`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'success'
-        }).then(() => {
-          this.loading = true
-          let params = {
-            token: this.token,
-            asset_num: this.checkRow.asset_num,
-            user_list: userIDList
-          }
-          AssetChangeAPI.grantOthers(params).then(data => {
-            if (data.ID === '1') {
-              this.$message({
-                type: 'success',
-                message: `${data.msg}`
-              })
-            } else {
-              this.$message({
-                type: 'warning',
-                message: `${data.msg}`
-              })
-            }
-          }).finally(() => {
-            this.loading = false
-            this.checkRow = {}
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
-        })
-      }
-      this.addCancel()
+    uploadSuccess () {
+      this.dialogVisible = false
+      this.handleEnterPageone()
     },
-    addCancel () {
-      this.userDialogVisible = false
-    },
-    // 点击申请更换责任人或部门或两者都换
-    changeAsset (row, type) {
-      this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
-    },
-    importLabel () {
-      this.grantShow = true
-    },
-    handleClose () {
-      this.grantShow = false
+    approveTuiKu (row) {
+      this.assetFlowInfo = Object.assign({}, row)
+      this.dialogVisible = true
     }
   },
   components: {
-    assetTable, advancedSearch, exitFileDetail, searchUserDialog
+    assetTable, advancedSearch, exitAssetApprove
   }
 }
 </script>

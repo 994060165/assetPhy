@@ -1,5 +1,10 @@
 <template>
-    <div>
+  <el-dialog
+    title="流程详情"
+    width="80"
+    :visible.sync="dialogVisible" 
+    :before-close="handleCancel">
+    <div v-loading="loading">
       <el-steps :active="active" finish-status="success" align-center>
         <el-step 
           v-for="(item, index) in steps"
@@ -17,6 +22,7 @@
         </el-step>
       </el-steps>
     </div>
+  </el-dialog>
 </template>
 <script>
 import {FlowAPI} from '@/api/flowAPI.js'
@@ -26,6 +32,10 @@ export default {
     orderNo: {
       type: String,
       default: ''
+    },
+    dialogVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -33,7 +43,8 @@ export default {
       active: 0,
       fixedArea: false,
       token: TokenAPI.getToken(),
-      steps: []
+      steps: [],
+      loading: false
     }
   },
   mounted () {
@@ -45,12 +56,15 @@ export default {
   },
   methods: {
     getSteps () {
+      this.loading = true
       let params = {
         token: this.token,
         order_no: this.orderNo
       }
       FlowAPI.getFlowActionsToOrderNO(params).then(data => {
         this.steps = data.data
+      }).finally(() => {
+        this.loading = false
       })
       FlowAPI.getOrderInfo(params).then(data => {
         let arr = []
@@ -67,6 +81,9 @@ export default {
         })
         this.active = arr.length
       })
+    },
+    handleCancel () {
+      this.$emit('closeDialog')
     }
   },
   created () {

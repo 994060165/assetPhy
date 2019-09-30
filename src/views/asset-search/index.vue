@@ -2,11 +2,13 @@
 <div class="asset-search padding-20">
   <datagrid ref="datagrid"
     :server-page="true"
+    :showFileBtn="true"
     :table-data="allAssets"
     :search-form="searchForm"
-    @handleSearch="handleSearch">
+    @handleSearch="handleSearch"
+    @downFile="exportExcel">
     <template slot="form">
-      <el-row :gutter="16">
+      <el-row :gutter="16" style="padding-bottom: 30px;">
         <el-col :span="8">
           <el-form-item label="资产名称">
             <el-input v-model="searchForm.name"></el-input>
@@ -102,6 +104,7 @@ import detail from '@/components/asset/detail.vue'
 import createDialog from './createDialog.vue'
 import api from '@/api'
 import moment from 'moment'
+import { type } from '../../../static/data'
 // import TokenAPI from '@/request/TokenAPI.js'
 export default {
   mounted () {
@@ -124,7 +127,7 @@ export default {
         start_time: []
       },
       allPersons: [],
-      isFuzzy: false,
+      isFuzzy: true,
       imgs: {},
       dialogVisible: false,
       assetData: {},
@@ -179,6 +182,56 @@ export default {
       } else {
         this.handleEnter()
       }
+    },
+    downloadFile (fileName, filePath) {
+      const a = document.createElement('a')
+      a.setAttribute('download', fileName)
+      a.setAttribute('href', filePath)
+      document.body.appendChild(a)
+      a.style.display = 'none'
+      a.click()
+      this.$refs.datagrid.downLoading = false
+      // window.open(filePath)
+    },
+    exportExcel (isSearch) {
+      this.$refs.datagrid.downLoading = true
+      let params
+      let path
+      // 精确查询： getassetToExportExcel； 模糊查询： getassetlikeToExportExcel；
+      if (!this.isFuzzy) {
+        params = Object.assign({}, this.searchForm)
+        if (this.searchForm.start_time[0]) {
+          params.minDate = moment(this.searchForm.start_time[0].getTime()).format('YYYY-MM-DD')
+          params.maxDate = moment(this.searchForm.start_time[1].getTime()).format('YYYY-MM-DD')
+        }
+        path = 'getassetToExportExcel'
+      } else {
+        params = {
+          keystr: this.keystr
+        }
+        path = 'getassetlikeToExportExcel'
+      }
+      api.getassetToExportExcel(params, path).then(data => {
+        if (data.ID === '-1') {
+          this.$refs.datagrid.downLoading = false
+          this.$message({
+            type: 'error',
+            message: `${data.message}`
+          })
+        } else {
+          let splitPath = data.split('\\')
+          console.log(splitPath)
+          let path = `${window.location.origin}/${type}/public/ExportAsset/${splitPath[2]}`
+          console.log(path)
+          this.downloadFile(`${splitPath[2]}`, path)
+        }
+      }, () => {
+        this.$refs.datagrid.downLoading = false
+        this.$message({
+          type: 'error',
+          message: `下载失败，获取下载文件路径失败`
+        })
+      })
     },
     seeDetail (row) {
       this.visible = true

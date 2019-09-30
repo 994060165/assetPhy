@@ -29,7 +29,7 @@
         <el-button @click="reset">重置</el-button>
         </div>
       </el-row>
-      <span class="up-icon iconfont icon-down-trangle" @click="toggleShow()"></span>
+      <i class="up-icon iconfont icon-down-trangle el-icon-arrow-up" @click="toggleShow()"></i>
     </div>
  </div>
 </div>

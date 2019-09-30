@@ -27,5 +27,8 @@ export default {
    */
   searchDoorList: params => {
     return axios.post(`/res/door_guarder/search_rowlist`, params).then(res => res.data)
+  },
+  getAllOutOrder: params => {
+    return axios.post(`/flow/index/getAllOutOrder`, params).then(res => res.data)
   }
 }

@@ -216,7 +216,7 @@ export default {
         } else {
           let splitPath = data.filepath.split('\\')
           console.log(splitPath)
-          let path = `${window.location.origin}/${type}/public/CheckReport/${splitPath[2]}`
+          let path = `${window.location.origin}/${type}/public/CheckReport/${splitPath[2]}.doc`
           console.log(path)
           this.downloadFile('盘点结果word', path)
         }
