@@ -4,6 +4,7 @@
       
     <el-button type="primary" @click="outputCheckRepot" class="pull-left">导出Word</el-button>
     <el-button type="primary" @click="exportAssetToExcel" class="pull-left">导出Excel</el-button>
+    <el-button type="success" @click="uploadAlls" class="pull-left">导入盘点结果</el-button>
     <el-input 
       class="w-400"
       placeholder="请输入资产名称/资产编码/责任部门/责任人"
@@ -120,17 +121,28 @@
       </el-row>
     </el-dialog>
   </el-row>
+  <uploadFileDialog
+    :formVisible="uploadFileVisible"
+    :tableTitle="uploadFileTitle"
+    :downPath="downPath"
+    :templateName="templateName"
+    :uploadUrl="uploadUrl"
+    :formData="formData"
+    @handleClose="handleClose"
+    @uploadSuccess="uploadSuccess">
+  </uploadFileDialog>
 </div>
 </template>
 
 <script>
 import datagrid from '@/components/common/datagrid.vue'
+import uploadFileDialog from '@/components/uploadFileDialog.vue'
 import { type } from '../../../static/data'
 import api from '@/api'
 // import moment from 'moment'
 export default {
   components: {
-    datagrid
+    datagrid, uploadFileDialog
   },
   mounted () {
     this.planId = this.$route.params.planId
@@ -138,6 +150,16 @@ export default {
   },
   data () {
     return {
+      // 文件上传控制
+      uploadFileVisible: false,
+      // 模块标题
+      uploadFileTitle: '导入盘点结果',
+      // 模板下载路径
+      // downPath: '上传贴签完成情况模板.xlsx',
+      downPath: '盘点结果导入模板.xlsx',
+      // 下载的模板的文件名称
+      templateName: '',
+      uploadUrl: '/res/index/uploadchecksexcel',
       type: type,
       loading: false,
       planId: '',
@@ -157,6 +179,7 @@ export default {
       assetsTotal: 0,
       assetkeystr: '',
       assetsSelections: [],
+      formData: '',
       deptData: [{
         id: 1,
         label: '过程所',
@@ -448,6 +471,16 @@ export default {
       })
       let ids = this.$refs.depttree.getCheckedKeys()
       console.log(ids)
+    },
+    uploadAlls () {
+      this.uploadFileVisible = true
+    },
+    handleClose () {
+      this.uploadFileVisible = false
+    },
+    uploadSuccess (resData) {
+      this.handleClose()
+      console.log(resData)
     }
   }
 }

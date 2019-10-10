@@ -84,6 +84,7 @@
 import moment from 'moment'
 import searchUserDialog from '@/components/sysSelectPeople.vue'
 import {TokenAPI} from '@/request/TokenAPI'
+import service from '@/api/service.js'
 import {remindOptions, remindTypes} from '@/service/common.js'
 export default {
   props: {
@@ -108,7 +109,7 @@ export default {
       remindOptions: remindOptions,
       remindTypes: remindTypes,
       remindWay: ['information'],
-      remindRate: ''
+      remindRate: '24'
     }
   },
   mounted () {
@@ -116,7 +117,44 @@ export default {
   methods: {
     confirm () {
       this.loading = true
-      this.closeDialog()
+      let scdType = ''
+      if (this.remindWay.length > 0) {
+        this.remindWay.forEach((value, index) => {
+          if (index === this.remindWay.length - 1) {
+            scdType += `${value}`
+          } else {
+            scdType += `${value},`
+          }
+        })
+      }
+      let params = {
+        token: this.token,
+        scd_type: scdType,
+        scd_frequency: this.remindRate,
+        returntime: this.assetFlowInfo.c08,
+        UserID: this.assetFlowInfo.c25,
+        deptname: this.assetFlowInfo.c05,
+        asset_name: this.assetFlowInfo.asset_name,
+        asset_num: this.assetFlowInfo.asset_num,
+        reason: this.assetFlowInfo.c03
+      }
+      console.log(params)
+      service.savetimingTask(params).then(data => {
+        if (data.ID === '-1') {
+          this.$message({
+            type: 'error',
+            message: '提醒设置失败！'
+          })
+        } else {
+          this.$message({
+            type: 'success',
+            message: '提醒设置成功！'
+          })
+          this.closeDialog()
+        }
+      }).finally(() => {
+        this.loading = false
+      })
     },
     closeDialog  () {
       this.$nextTick(() => {

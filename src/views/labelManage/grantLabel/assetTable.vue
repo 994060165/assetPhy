@@ -1,7 +1,7 @@
 <template>
   <el-table :data="tableList">
     <el-table-column type="index" label="序号" width="80"></el-table-column>
-    <el-table-column prop="assetid" label="资产编码">
+    <el-table-column prop="asset_id" label="资产编码">
     </el-table-column>
     <slot name="handle">
 

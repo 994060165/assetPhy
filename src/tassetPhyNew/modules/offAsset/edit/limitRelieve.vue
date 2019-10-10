@@ -35,7 +35,7 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="出门受限原因:" prop="backreason">
+            <el-form-item label="退库受限原因:" prop="backreason">
               <el-input
                 type="textarea"
                 :rows="2"

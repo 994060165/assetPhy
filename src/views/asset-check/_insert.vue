@@ -222,7 +222,7 @@ export default {
     left: 0;
   }
 }
-.el-dialog__header{background: #f6f6f6;border-bottom: 1px solid #ddd;}
+.el-dialog__header{border-bottom: 1px solid #ddd;}
 .el-dialog__footer{border-top:1px solid #ddd;}
 .asset-check__add .model .el-form{width:380px;margin: 0 auto;}
 </style>

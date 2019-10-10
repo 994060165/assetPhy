@@ -1,19 +1,23 @@
 const remindOptions = [
   {
-    value: 'oneDay',
+    value: '24',
     label: '一天一次'
   },
   {
-    value: 'twoDay',
+    value: '48',
     label: '两天一次'
   },
   {
-    value: 'threeDay',
+    value: '72',
     label: '三天一次'
   },
   {
-    value: 'week',
+    value: '168',
     label: '一周一次'
+  },
+  {
+    value: '720',
+    label: '一月一次'
   }
 ]
 const remindTypes = [

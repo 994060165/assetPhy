@@ -2,13 +2,13 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>退库管理</el-breadcrumb-item>
+      <el-breadcrumb-item>变更管理</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
   <el-row class="padding-10  text-right">
     <el-button type="primary" @click="goBack">返回</el-button>
-    <el-button type="success" @click="uploadAlls">导入退库记录</el-button>
+    <el-button type="success" @click="uploadAlls">导入变更记录</el-button>
     <el-input 
       class="w-400"
       placeholder="请输入资产名称/资产编码"
@@ -122,10 +122,10 @@ export default {
       // 文件上传控制
       uploadFileVisible: false,
       // 模块标题
-      uploadFileTitle: '退库情况文件导入',
+      uploadFileTitle: '资产变更情况文件导入',
       // 模板下载路径
       // downPath: '上传贴签完成情况模板.xlsx',
-      downPath: '退库模板.xlsx',
+      downPath: '资产变更模板.xlsx',
       // 下载的模板的文件名称
       templateName: '',
       uploadUrl: '/flow/index/uploadAllExt',
@@ -172,7 +172,7 @@ export default {
         if (data.ID === '-1') {
           this.$message({
             type: 'error',
-            message: '获取退库信息失败'
+            message: '获取资产变更列表信息失败'
           })
         } else {
           this.total = data.count

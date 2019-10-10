@@ -63,7 +63,7 @@
 import moment from 'moment'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import {UploadApi} from '@/service/index.js'
-import { type } from '../../static/data'
+import { type } from '../../../../../static/data'
 // import serviceApi from '@/api/service.js'
 import $ from 'jquery'
 export default {

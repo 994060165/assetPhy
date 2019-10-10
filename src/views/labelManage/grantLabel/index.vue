@@ -114,7 +114,8 @@ export default {
         pagesize: this.pagesize,
         token: this.token
       }
-      service.getassetlike(params).then(data => {
+      service.getsentLabel(params).then(data => {
+        console.log(data)
         this.total = data.count
         this.tableList = data.data
       }).finally(() => {

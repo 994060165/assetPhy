@@ -5,6 +5,7 @@ const assetPhyNew = r => require.ensure([], () => r(require('../App')), 'sys')
 const assetChangeIndex = r => require.ensure([], () => r(require('../modules/assetChange/index')), 'assetChangeIndex')
 const changeAssetDeorPer = r => require.ensure([], () => r(require('../modules/assetChange/changeAssetDeorPer')), 'changeAssetDeorPer')
 const myChangeList = r => require.ensure([], () => r(require('../modules/assetChange/myChangeList')), 'myChangeList')
+const assetChangeManage = r => require.ensure([], () => r(require('../modules/assetChange/assetChangeManage')), 'assetChangeManage')
 const assetApprove = r => require.ensure([], () => r(require('../modules/assetChange/assetApprove')), 'assetApprove')
 // 出门流程
 const exitFileAdd = r => require.ensure([], () => r(require('../modules/exitFile/exitFileAdd')), 'exitFile/exitFileAdd')
@@ -43,6 +44,10 @@ const assetPhyNewRoutes = {
     {
       path: 'myChangeList',
       component: myChangeList
+    },
+    {
+      path: 'assetChangeManage',
+      component: assetChangeManage
     },
     {
       path: 'assetApprove/:assetNum/:orderNum/:type',

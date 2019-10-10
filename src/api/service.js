@@ -30,5 +30,14 @@ export default {
   },
   getAllOutOrder: params => {
     return axios.post(`/flow/index/getAllOutOrder`, params).then(res => res.data)
+  },
+  getsentLabel: params => {
+    return axios.post(`/res/index/getsentLabel`, params).then(res => res.data)
+  },
+  savetimingTask: params => {
+    return axios.post(`/flow/index/savetimingTask`, params).then(res => res.data)
+  },
+  getCheckplanToDetail: params => {
+    return axios.post(`/res/index/getCheckplanToDetail`, params).then(res => res.data)
   }
 }

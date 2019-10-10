@@ -95,7 +95,7 @@ export default {
 <style lang="scss">
 @import '../../assets/styles/base.scss';
 
-.el-dialog__header{background: #f6f6f6;border-bottom: 1px solid #ddd;}
+.el-dialog__header{border-bottom: 1px solid #ddd;}
 .el-dialog__footer{border-top:1px solid #ddd;}
 // .model .el-form{width:380px;margin: 0 auto;}
 .asset-tpl-add .el-form-item .el-form-item {
