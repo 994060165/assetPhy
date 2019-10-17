@@ -9,26 +9,21 @@
       <el-form ref="changeForm" :model="assetFlowInfo" label-width="120px">
         <el-row class="m-t-20">
           <el-col :span="12">
-            <el-form-item label="资产名称：">
+            <el-form-item label="盘点计划：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.asset_name}}
+                {{assetFlowInfo.plan_name}}
               </div>
             </el-form-item>
-            <el-form-item label="领用时间：">
+            <el-form-item label="截止时间：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.bind_date}}
+                {{assetFlowInfo.deadline}}
               </div>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="资产编码：">
+            <el-form-item label="计划说明：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.asset_num}}
-              </div>
-            </el-form-item>
-            <el-form-item label="标签领用人：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.bind_person}}
+                {{assetFlowInfo.plan_memo}}
               </div>
             </el-form-item>
           </el-col>
@@ -83,7 +78,7 @@ export default {
     },
     dialogTitle: {
       type: String,
-      default: '贴签提醒设置'
+      default: '盘点到期提醒设置'
     }
   },
   data () {

@@ -37,7 +37,13 @@
               v-if="scope.row.exeResult === '未盘点'"
               @click="changeStatus(scope.row)"></el-button>
 
-
+              <el-button
+                size="mini"
+                icon="el-icon-edit"
+                title="设置提醒"
+                type="success"
+                @click="remind(scope.row)">
+              </el-button>
             <el-button type="danger" icon="el-icon-delete" title="删除计划" size="mini" @click="deletePlan(scope.row.plan_id)"></el-button>
             
           </template>
@@ -59,6 +65,15 @@
     ref="insert"
     @refresh="closeInsertDialog"
     :insertVisible="insertVisible"></insert>
+    
+  <remindDetail
+    v-if="dialogVisible"
+    :dialogVisible="dialogVisible"
+    :dialogTitle="dialogTitle"
+    :assetFlowInfo="assetFlowInfo"
+    @closeDialog="closeDialog">
+
+  </remindDetail>
 </div>
 </template>
 
@@ -66,13 +81,15 @@
 import datagrid from '@/components/common/datagrid.vue'
 import detail from '@/views/asset-check/_detail.vue'
 import insert from '@/views/asset-check/_insert.vue'
+import remindDetail from './remindDetail.vue'
 import api from '@/api'
 
 export default {
   components: {
     datagrid,
     detail,
-    insert
+    insert,
+    remindDetail
   },
   mounted () {
     this.handleRefresh()
@@ -86,7 +103,9 @@ export default {
       keystr: '',
       page: 1,
       pagesize: 10,
-      total: 0
+      total: 0,
+      dialogVisible: false,
+      assetFlowInfo: {}
     }
   },
   methods: {
@@ -97,6 +116,13 @@ export default {
     handleChange (val) {
       this.page = val
       this.handleRefresh()
+    },
+    remind (row) {
+      this.assetFlowInfo = Object.assign({}, row)
+      this.dialogVisible = true
+    },
+    closeDialog () {
+      this.dialogVisible = false
     },
     handleRefresh () {
       this.loading = true

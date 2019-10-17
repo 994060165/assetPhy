@@ -21,12 +21,12 @@
       :tableList="tableList">
       <el-table-column label="标签领用人" width="120" align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.receiver}}</span>
+          <span>{{scope.row.bind_person}}</span>
         </template>
       </el-table-column>
       <el-table-column label="领取时间"  align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.receivedate}}</span>
+          <span>{{scope.row.bind_date}}</span>
         </template>
       </el-table-column>
       <el-table-column label="提醒" width="120" slot="handle">
@@ -56,8 +56,8 @@
   </uploadFileDialog>
   <exitFileDetail
   :dialogVisible="remindVisible"
-  :assetInfo="assetInfo"
-  @closeDialog="closeRemindDialog">
+  :assetFlowInfo="assetInfo"
+  @closeDialog="closeRemind">
   </exitFileDetail>
 </div>
 </template>
@@ -93,7 +93,7 @@ export default {
       templateName: '',
       uploadUrl: '/res/index/uploadpastelabelexcel',
       remindVisible: false,
-      assetInfo: []
+      assetInfo: {}
     }
   },
   mounted () {
@@ -122,7 +122,7 @@ export default {
         pagesize: this.pagesize,
         token: this.token
       }
-      service.getassetlike(params).then(data => {
+      service.getStickLabelList(params).then(data => {
         this.total = data.count
         this.tableList = data.data
       }).finally(() => {
@@ -132,11 +132,11 @@ export default {
     // 点击设置提醒频率
     changeCheckLabel (row) {
       this.remindVisible = true
-      this.assetInfo.push(row)
+      this.assetInfo = Object.assign({}, row)
     },
     closeRemind () {
       this.remindVisible = false
-      this.assetInfo = []
+      this.assetInfo = {}
     },
     uploadAlls () {
       this.uploadFileVisible = true

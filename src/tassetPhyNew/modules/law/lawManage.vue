@@ -2,16 +2,16 @@
 <div class="asset-tpl">
   <el-row class="m-t-20 p-l-10">
     <el-breadcrumb separator-class="el-icon-arrow-right" class="font-18">
-      <el-breadcrumb-item>退库管理</el-breadcrumb-item>
+      <el-breadcrumb-item>法规管理</el-breadcrumb-item>
     </el-breadcrumb>
   </el-row>
   <el-row class="interval"></el-row>
   <el-row class="padding-10  text-right">
     <el-button type="primary" @click="goBack">返回</el-button>
-    <el-button type="success" @click="uploadAlls">导入退库记录</el-button>
+    <el-button type="success" @click="uploadAlls">增加法规</el-button>
     <el-input 
       class="w-400"
-      placeholder="请输入资产名称/资产编码"
+      placeholder="请输入法规标题"
       v-model="keystr" @keyup.enter.native="handleEnterPageone">
       <el-button slot="append" icon="el-icon-search" @click="handleEnterPageone"></el-button>
     </el-input>
@@ -29,27 +29,19 @@
   <el-row class="padding-10" v-loading="loading">
      <el-table :data="tableList">
         <el-table-column type="index" label="序号" width="80"></el-table-column>
-        <el-table-column prop="asset_num" label="资产编码">
-        </el-table-column>
-        <el-table-column 
-          prop="asset_name" 
-          label="资产名称">
-        </el-table-column>
-        <el-table-column
-          prop="org_id" 
-          show-overflow-tooltip 
-          label="部门">
-        </el-table-column>
-        <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
-        <el-table-column label="退库日期">
+        <el-table-column label="法规">
           <template slot-scope="scope">
-            {{scope.row.create_date | moment}}
+            <div v-html="scope.row.rulename">
+              
+            </div>
           </template>
         </el-table-column>
-        <el-table-column 
-          prop="c03" 
-          show-overflow-tooltip 
-          label="退库理由">
+        <el-table-column label="操作" width="120">
+          <template slot-scope="scope">
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="delRule(scope.row)"></el-button>
+            <el-button type="warning" size="mini" icon="el-icon-view" @click="viewRule(scope.row)"></el-button>
+            <el-button type="success" size="mini" icon="el-icon-edit" @click="editRule(scope.row)"></el-button>
+          </template>
         </el-table-column>
       </el-table>
   </el-row>
@@ -68,6 +60,9 @@
     :downPath="downPath"
     :templateName="templateName"
     :uploadUrl="uploadUrl"
+    :isEdit="isEdit"
+    v-if="uploadFileVisible"
+    :formInfo="formDataInfo"
     @handleClose="handleClose"
     @uploadSuccess="uploadSuccess">
   </uploadFileDialog>
@@ -103,14 +98,16 @@ export default {
       // 文件上传控制
       uploadFileVisible: false,
       // 模块标题
-      uploadFileTitle: '退库情况文件导入',
+      uploadFileTitle: '上传法规',
       // 模板下载路径
       // downPath: '上传贴签完成情况模板.xlsx',
       downPath: '退库模板.xlsx',
       // 下载的模板的文件名称
       templateName: '',
-      uploadUrl: '/flow/index/uploadAllExt',
-      flowNameOption: commonService.flowNameOption
+      uploadUrl: '/res/index/addrule',
+      flowNameOption: commonService.flowNameOption,
+      formDataInfo: {},
+      isEdit: false
     }
   },
   mounted () {
@@ -136,11 +133,6 @@ export default {
     },
     // 获取列表数据
     getTableList () {
-      // let params = Object.assign({}, this.searchForm)
-      // if (this.searchForm.start_time[0]) {
-      //   params.minDate = moment(this.searchForm.start_time[0].getTime()).format('YYYY-MM-DD')
-      //   params.maxDate = moment(this.searchForm.start_time[1].getTime()).format('YYYY-MM-DD')
-      // }
       this.loading = true
       let params = {
         keystr: this.keystr,
@@ -148,11 +140,11 @@ export default {
         pagesize: this.pagesize,
         token: this.token
       }
-      service.finishAssetBackList(params).then(data => {
+      service.getRuleLIst(params).then(data => {
         if (data.ID === '-1') {
           this.$message({
             type: 'error',
-            message: '获取退库列表信息失败'
+            message: '获取法规信息失败'
           })
         } else {
           this.total = data.count
@@ -167,6 +159,7 @@ export default {
       this.$router.push(`/asset/changeAsset/${row.asset_num}/${type}`)
     },
     uploadAlls () {
+      this.isEdit = false
       this.uploadFileVisible = true
     },
     handleClose () {
@@ -175,6 +168,48 @@ export default {
     uploadSuccess (resData) {
       this.handleClose()
       console.log(resData)
+    },
+    editRule (row) {
+      console.log(row)
+      this.isEdit = true
+      this.uploadFileVisible = true
+      this.formDataInfo = Object.assign({}, row)
+    },
+    delRule (row) {
+      this.$confirm('是否删除该条法规?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let params = {
+          token: this.token,
+          ruleID: row.ruleID
+        }
+        service.deleteRule(params).then(data => {
+          if (data.ID === '-1') {
+            this.$message({
+              type: 'error',
+              message: '删除法规失败'
+            })
+          } else {
+            this.$message({
+              type: 'success',
+              message: '删除成功！'
+            })
+            this.handleEnterPageone()
+          }
+        }).finally(() => {
+          this.loading = false
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
+    },
+    viewRule (row) {
+      console.log(row)
     }
   },
   components: {

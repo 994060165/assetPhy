@@ -9,26 +9,41 @@
       <el-form ref="changeForm" :model="assetFlowInfo" label-width="120px">
         <el-row class="m-t-20">
           <el-col :span="12">
-            <el-form-item label="资产名称：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.asset_name}}
-              </div>
-            </el-form-item>
-            <el-form-item label="领用时间：">
-              <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.bind_date}}
-              </div>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="资产编码：">
+            <el-form-item label="资产编号：">
               <div class="panelBody" style="width: 100%;">
                 {{assetFlowInfo.asset_num}}
               </div>
             </el-form-item>
-            <el-form-item label="标签领用人：">
+            <el-form-item label="部门：">
               <div class="panelBody" style="width: 100%;">
-                {{assetFlowInfo.bind_person}}
+                {{assetFlowInfo.deparment}}
+              </div>
+            </el-form-item>
+            <el-form-item label="出门理由：">
+              <div class="panelBody" style="width: 100%;">
+                {{assetFlowInfo.c03}}
+              </div>
+            </el-form-item>
+            <el-form-item label="预计回归日期：">
+              <div class="panelBody" style="width: 100%;">
+                {{assetFlowInfo.c08}}
+              </div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="资产名称：">
+              <div class="panelBody" style="width: 100%;">
+                {{assetFlowInfo.name}}
+              </div>
+            </el-form-item>
+            <el-form-item label="责任人：">
+              <div class="panelBody" style="width: 100%;">
+                {{assetFlowInfo.zzr_name}}
+              </div>
+            </el-form-item>
+            <el-form-item label="去向地点：">
+              <div class="panelBody" style="width: 100%;">
+                {{assetFlowInfo.c04}}
               </div>
             </el-form-item>
           </el-col>
@@ -69,7 +84,6 @@
 import moment from 'moment'
 import searchUserDialog from '@/components/sysSelectPeople.vue'
 import {TokenAPI} from '@/request/TokenAPI'
-import service from '@/api/service.js'
 import {remindOptions, remindTypes} from '@/service/common.js'
 export default {
   props: {
@@ -83,7 +97,7 @@ export default {
     },
     dialogTitle: {
       type: String,
-      default: '贴签提醒设置'
+      default: '出门条提醒设置'
     }
   },
   data () {
@@ -94,7 +108,7 @@ export default {
       remindOptions: remindOptions,
       remindTypes: remindTypes,
       remindWay: ['information'],
-      remindRate: '24'
+      remindRate: ''
     }
   },
   mounted () {
@@ -102,40 +116,7 @@ export default {
   methods: {
     confirm () {
       this.loading = true
-      let scdType = ''
-      if (this.remindWay.length > 0) {
-        this.remindWay.forEach((value, index) => {
-          if (index === this.remindWay.length - 1) {
-            scdType += `${value}`
-          } else {
-            scdType += `${value},`
-          }
-        })
-      }
-      let params = {
-        token: this.token,
-        scd_type: scdType,
-        scd_frequency: this.remindRate,
-        deadline: this.assetFlowInfo.deadline,
-        create_person: this.assetFlowInfo.create_person,
-        plan_name: this.assetFlowInfo.plan_name
-      }
-      service.savePlanTimingTask(params).then(data => {
-        if (data.ID === '-1') {
-          this.$message({
-            type: 'error',
-            message: '提醒设置失败！'
-          })
-        } else {
-          this.$message({
-            type: 'success',
-            message: '提醒设置成功！'
-          })
-          this.closeDialog()
-        }
-      }).finally(() => {
-        this.loading = false
-      })
+      this.closeDialog()
     },
     closeDialog  () {
       this.$nextTick(() => {

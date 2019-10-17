@@ -167,5 +167,8 @@ export default {
   },
   getassetToExportExcel (params, path) {
     return axios.post(`/res/index/${path}`, params).then(res => res.data)
+  },
+  getCheckplanToDetail: params => {
+    return axios.post(`/res/index/getCheckplanToDetail`, params).then(res => res.data)
   }
 }

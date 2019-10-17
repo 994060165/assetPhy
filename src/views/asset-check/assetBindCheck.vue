@@ -14,6 +14,9 @@
     <el-button type="primary" @click="bindAsset">添加数据</el-button>
     <el-button type="primary" @click="goBack">返回</el-button>
   </el-row>
+  <el-row class="padding-10">
+    <el-progress :text-inside="true" :stroke-width="18" :percentage="percentage" :color="checkColor[checkValue]"></el-progress>
+  </el-row>
   <el-row>
     <el-table :data="allChecks" v-loading="loading" element-loading-text="数据加载中，请稍候...">
       <el-table-column prop="name" label="设备名称" width="100"></el-table-column>
@@ -137,6 +140,7 @@
 <script>
 import datagrid from '@/components/common/datagrid.vue'
 import uploadFileDialog from '@/components/uploadFileDialog.vue'
+import {TokenAPI} from '@/request/TokenAPI'
 import { type } from '../../../static/data'
 import api from '@/api'
 // import moment from 'moment'
@@ -147,9 +151,11 @@ export default {
   mounted () {
     this.planId = this.$route.params.planId
     this.handleRefresh()
+    this.searchProgress()
   },
   data () {
     return {
+      token: TokenAPI.getToken(),
       // 文件上传控制
       uploadFileVisible: false,
       // 模块标题
@@ -208,7 +214,15 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'label'
-      }
+      },
+      checkColor: {
+        less: '#f56c6c',
+        success: '#409eff',
+        more: '#8e71c7',
+        full: '#67c23a'
+      },
+      percentage: 0,
+      checkValue: 'less'
     }
   },
   methods: {
@@ -227,7 +241,7 @@ export default {
     // 导出盘点结果
     outputCheckRepot () {
       let params = {
-        token: window.sessionStorage.getItem('token'),
+        token: this.token,
         plan_id: this.planId
       }
       api.getPlanWord(params).then(data => {
@@ -248,7 +262,7 @@ export default {
     // 导出盘点结果excel
     exportAssetToExcel () {
       let params = {
-        token: window.sessionStorage.getItem('token'),
+        token: this.token,
         plan_id: this.planId
       }
       api.exportAssetToExcel(params).then(data => {
@@ -287,7 +301,8 @@ export default {
         exeResult: this.finished,
         page: this.currentPage,
         pagesize: this.pageSize,
-        order: 'check_flag'
+        order: 'check_flag',
+        token: this.token
       }
       api.getPlanAssteList(params).then(data => {
         console.log('data', data)
@@ -297,6 +312,46 @@ export default {
       }, err => {
         console.log(err)
         this.loading = false
+      })
+    },
+    searchProgress () {
+      let params = {
+        plan_id: this.planId,
+        token: this.token
+      }
+      api.getCheckplanToDetail(params).then(data => {
+        if (data.ID === '1') {
+          let allCount = data.allcount
+          let count = data.count
+          let percentage = parseFloat((count / allCount * 100 | 0))
+          this.percentage = percentage
+          switch (true) {
+            case (percentage > 0 | percentage === 0) && percentage < 30:
+              this.checkValue = 'less'
+              break
+            case (percentage > 30 | percentage === 30) && percentage < 60:
+              this.checkValue = 'success'
+              break
+            case (percentage > 60 | percentage === 60) && percentage < 100:
+              this.checkValue = 'more'
+              break
+            case percentage === 100:
+              this.checkValue = 'full'
+              break
+            default:
+              this.checkValue = 'success'
+          }
+        } else {
+          this.$message({
+            type: 'error',
+            message: `查询盘点进度失败！${data.msg}`
+          })
+        }
+      }, () => {
+        this.$message({
+          type: 'error',
+          message: '查询盘点进度失败！'
+        })
       })
     },
     handleChange (val) {

@@ -1,5 +1,7 @@
 // 此处写sys的分支路由信息
 const doorLog = r => require.ensure([], () => r(require('../modules/exitFile/doorLog')), 'exitFile/doorLog')
+// 法规管理
+const lawManage = r => require.ensure([], () => r(require('../modules/law/lawManage')), 'lawManage')
 // 资产变更
 const assetPhyNew = r => require.ensure([], () => r(require('../App')), 'sys')
 const assetChangeIndex = r => require.ensure([], () => r(require('../modules/assetChange/index')), 'assetChangeIndex')
@@ -32,6 +34,12 @@ const assetPhyNewRoutes = {
       path: 'doorLog',
       component: doorLog
     },
+    // 法规
+    {
+      path: 'lawManage',
+      component: lawManage
+    },
+    // 变更
     {
       path: 'assetChangeIndex',
       name: 'assetChangeIndex',

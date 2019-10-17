@@ -27,19 +27,19 @@
           <el-row :gutter="10" v-if="showImgVisible">
             <el-col :span="6">
               <div class="text-center">标签与铭牌合照</div>
-              <img :src="`/${type}/${imgs.img_bq}`" alt="" v-if="!!!imgs.img_bq" class="w-full" @click="showImgPlus('img_bq')">
+              <img :src="`/${type}/${imgs.img_bq}`" alt="" v-if="imgs.img_bq" class="w-full" @click="showImgPlus('img_bq')">
             </el-col>
             <el-col :span="6">
               <div class="text-center">标签与局部合照</div>
-              <img :src="`/${type}/${imgs.img_jb}`" alt="" v-if="!!!imgs.img_jb" class="w-full" @click="showImgPlus('img_jb')">
+              <img :src="`/${type}/${imgs.img_jb}`" alt="" v-if="imgs.img_jb" class="w-full" @click="showImgPlus('img_jb')">
             </el-col>
             <el-col :span="6">
               <div class="text-center">资产正面整体照片</div>
-              <img :src="`/${type}/${imgs.img_zt}`" alt="" v-if="!!!imgs.img_zt" class="w-full" @click="showImgPlus('img_zt')">
+              <img :src="`/${type}/${imgs.img_zt}`" alt="" v-if="imgs.img_zt" class="w-full" @click="showImgPlus('img_zt')">
             </el-col>
             <el-col :span="6">
               <div class="text-center"> 其他照片</div>
-              <img :src="`/${type}/${imgs.img_qt}`" alt="" v-if="!!!imgs.img_qt" class="w-full" @click="showImgPlus('img_qt')">
+              <img :src="`/${type}/${imgs.img_qt}`" alt="" v-if="imgs.img_qt" class="w-full" @click="showImgPlus('img_qt')">
             </el-col>
           </el-row>
         </el-collapse-item>
@@ -72,10 +72,6 @@ export default {
       type: Boolean,
       default: false
     },
-    imgs: {
-      type: Object,
-      default: {}
-    },
     assetnum: {
       type: String,
       default: ''
@@ -90,6 +86,7 @@ export default {
       token: TokenAPI.getToken(),
       collapseActiveName: '1',
       asset: {},
+      imgs: {},
       type: type,
       imgPlus: null,
       imgVisible: false,
@@ -119,6 +116,7 @@ export default {
         } else {
           this.showImgVisible = true
           this.imgs = data
+          // this.$set(this, 'imgs', data)
           // this.imgVisible = true
         }
       })
@@ -138,7 +136,7 @@ export default {
       console.log(this.type)
       console.log(this.assetImgs)
       console.log(img)
-      this.imgPlus = `/${this.type}/${this.assetImgs[img]}`
+      this.imgPlus = `/${this.type}/${this.imgs[img]}`
       // this.imgPlus = this.imgs[img]
       this.imgVisible = true
     },

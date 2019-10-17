@@ -34,10 +34,26 @@ export default {
   getsentLabel: params => {
     return axios.post(`/res/index/getsentLabel`, params).then(res => res.data)
   },
+  // 资产退库列表
+  finishAssetBackList: params => {
+    return axios.post(`/flow/index/finishAssetBackList`, params).then(res => res.data)
+  },
   savetimingTask: params => {
     return axios.post(`/flow/index/savetimingTask`, params).then(res => res.data)
   },
-  getCheckplanToDetail: params => {
-    return axios.post(`/res/index/getCheckplanToDetail`, params).then(res => res.data)
+  savePlanTimingTask: params => {
+    return axios.post(`/flow/index/savePlanTimingTask`, params).then(res => res.data)
+  },
+  getRuleLIst: params => {
+    return axios.post(`/res/index/getRuleLIst`, params).then(res => res.data)
+  },
+  deleteRule: params => {
+    return axios.post(`/res/index/deleteRule`, params).then(res => res.data)
+  },
+  updateRule: params => {
+    return axios.post(`/res/index/updateRule`, params).then(res => res.data)
+  },
+  getStickLabelList: params => {
+    return axios.post(`/res/index/getStickLabelList`, params).then(res => res.data)
   }
 }
