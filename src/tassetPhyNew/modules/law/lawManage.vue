@@ -66,6 +66,12 @@
     @handleClose="handleClose"
     @uploadSuccess="uploadSuccess">
   </uploadFileDialog>
+  <ruleDetail
+    :formVisible="detailVisible"
+    v-if="detailVisible"
+    :formInfo="detailInfo"
+    @handleClose="handleDetailClose">
+  </ruleDetail>
 </div>
 </template>
 
@@ -75,6 +81,7 @@ import advancedSearch from '@/components/advancedSearch.vue'
 import {TokenAPI} from '@/request/TokenAPI.js'
 import service from '@/api/service.js'
 import uploadFileDialog from './edit/uploadFileDialog.vue'
+import ruleDetail from './detail/ruleDetail.vue'
 import {commonService} from '../../service/commonService.js'
 export default {
   data () {
@@ -107,7 +114,9 @@ export default {
       uploadUrl: '/res/index/addrule',
       flowNameOption: commonService.flowNameOption,
       formDataInfo: {},
-      isEdit: false
+      isEdit: false,
+      detailVisible: false,
+      detailInfo: {}
     }
   },
   mounted () {
@@ -209,11 +218,16 @@ export default {
       })
     },
     viewRule (row) {
-      console.log(row)
+      this.detailVisible = true
+      this.detailInfo = Object.assign({}, row)
+    },
+    handleDetailClose () {
+      this.detailVisible = false
+      this.detailInfo = {}
     }
   },
   components: {
-    assetTable, advancedSearch, uploadFileDialog
+    assetTable, advancedSearch, uploadFileDialog, ruleDetail
   }
 }
 </script>

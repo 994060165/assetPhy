@@ -56,6 +56,19 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="提醒到期时间：">
+              <el-date-picker
+                v-model="endDate"
+                :clearable="false"
+                type="date"
+                :picker-options="pickerOptions"
+                placeholder="选择日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
     </el-row>
     <el-row slot="footer" class="dialogFooter text-center">
@@ -94,7 +107,13 @@ export default {
       remindOptions: remindOptions,
       remindTypes: remindTypes,
       remindWay: ['information'],
-      remindRate: '24'
+      remindRate: '24',
+      endDate: new Date(),
+      pickerOptions: {
+        disabledDate (time) {
+          return time.getTime() < Date.now()
+        }
+      }
     }
   },
   mounted () {
@@ -116,11 +135,12 @@ export default {
         token: this.token,
         scd_type: scdType,
         scd_frequency: this.remindRate,
-        deadline: this.assetFlowInfo.deadline,
-        create_person: this.assetFlowInfo.create_person,
-        plan_name: this.assetFlowInfo.plan_name
+        deadline: moment(this.endDate).format('YYYY-MM-DD'),
+        asset_name: this.assetFlowInfo.asset_name,
+        asset_num: this.assetFlowInfo.asset_num,
+        bind_people: this.assetFlowInfo.bind_person
       }
-      service.savePlanTimingTask(params).then(data => {
+      service.saveStickTask(params).then(data => {
         if (data.ID === '-1') {
           this.$message({
             type: 'error',

@@ -12,6 +12,8 @@ const sysDict = r => require.ensure([], () => r(require('../modules/sysDict/sysD
 
 // 搜索条件配置
 const searchConfig = r => require.ensure([], () => r(require('../modules/searchKey/searchConfig')), 'searchConfig')
+// 个人信息
+const userInfo = r => require.ensure([], () => r(require('../modules/userInfo/userRouter')), 'userInfo')
 
 const modulePath = '/sys'
 
@@ -58,6 +60,10 @@ const sysRoutes = {
     {
       path: 'searchConfig',
       component: searchConfig
+    },
+    {
+      path: 'userInfo',
+      component: userInfo
     }
   ]
 }

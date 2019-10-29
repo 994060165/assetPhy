@@ -44,6 +44,9 @@ export default {
   savePlanTimingTask: params => {
     return axios.post(`/flow/index/savePlanTimingTask`, params).then(res => res.data)
   },
+  saveStickTask: params => {
+    return axios.post(`/flow/index/saveStickTask`, params).then(res => res.data)
+  },
   getRuleLIst: params => {
     return axios.post(`/res/index/getRuleLIst`, params).then(res => res.data)
   },
