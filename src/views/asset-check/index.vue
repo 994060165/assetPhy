@@ -24,14 +24,19 @@
         <el-table-column prop="plan_name" label="计划名称"></el-table-column>
         <el-table-column prop="plan_memo" label="计划说明">
         </el-table-column>
+        <el-table-column label="盘点方式">
+          <template slot-scope="scope">
+            {{checkPlanType[scope.row.planType]}}
+          </template>
+        </el-table-column>
         <el-table-column prop="deadline" label="截止时间"></el-table-column>
         <el-table-column prop="create_person" label="创建人"></el-table-column>
-        <el-table-column  width="120" label="操作">
+        <el-table-column  width="160" label="操作">
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-view" title="查看计划" size="mini" @click="toAddBind(scope.row.plan_id)"></el-button>
             <el-button
-              type="success" 
-              icon="el-icon-edit" 
+              icon="el-icon-edit"
+              type="primary" 
               title="开启计划" 
               size="mini" 
               v-if="scope.row.exeResult === '未盘点'"
@@ -39,7 +44,7 @@
 
               <el-button
                 size="mini"
-                icon="el-icon-edit"
+              icon="el-icon-setting" 
                 title="设置提醒"
                 type="success"
                 @click="remind(scope.row)">
@@ -64,6 +69,7 @@
   <insert
     ref="insert"
     @refresh="closeInsertDialog"
+    v-if="insertVisible"
     :insertVisible="insertVisible"></insert>
     
   <remindDetail
@@ -82,6 +88,7 @@ import datagrid from '@/components/common/datagrid.vue'
 import detail from '@/views/asset-check/_detail.vue'
 import insert from '@/views/asset-check/_insert.vue'
 import remindDetail from './remindDetail.vue'
+import { checkPlanType } from '@/service/common.js'
 import api from '@/api'
 
 export default {
@@ -96,6 +103,7 @@ export default {
   },
   data () {
     return {
+      checkPlanType: checkPlanType,
       allChecks: [],
       currentAsset: {},
       finished: '',

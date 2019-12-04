@@ -174,7 +174,7 @@ export default {
         success: function (resData) {
           that.dataLoading = false
           that.clearFileList()
-          let data = resData[0]
+          let data = resData
           that.formData = new FormData()
           if (data.ID === '-1') {
             that.$message({
@@ -184,7 +184,7 @@ export default {
           } else {
             that.$message({
               type: 'success',
-              message: `上传成功!插入表中${data.savaRows}条。`
+              message: `上传成功!插入表中${data.saveRows}条。`
             })
           }
           that.$emit('uploadSuccess', resData)

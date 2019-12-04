@@ -36,39 +36,25 @@
           label="资产名称">
         </el-table-column>
         <el-table-column
-          prop="c05" 
+          prop="asset_num" 
           show-overflow-tooltip 
-          label="部门">
+          label="资产标签">
         </el-table-column>
         <!-- <el-table-column prop="zrr_name" width="100" label="责任人"></el-table-column> -->
+        <el-table-column 
+          prop="zrr_name" 
+          show-overflow-tooltip 
+          label="责任人名称">
+        </el-table-column>
+        <el-table-column
+          prop="location"
+          show-overflow-tooltip 
+          label="资产位置">
+        </el-table-column>
         <el-table-column label="申请日期">
           <template slot-scope="scope">
-            {{scope.row.start_time | moment}}
+            {{scope.row.createdate | moment}}
           </template>
-        </el-table-column>
-        <el-table-column 
-          prop="c03" 
-          show-overflow-tooltip 
-          label="出门理由">
-        </el-table-column>
-        <el-table-column
-          prop="c04"
-          show-overflow-tooltip 
-          label="去向地点">
-        </el-table-column>
-        <el-table-column
-          show-overflow-tooltip 
-          label="预计回归日期">
-            <template slot-scope="scope">
-              {{scope.row.c08 | moment}}
-            </template>
-        </el-table-column>
-        <el-table-column 
-          show-overflow-tooltip 
-          label="申请类型">
-            <template slot-scope="scope">
-              {{flowNameOption[scope.row.flow_id]}}
-            </template>
         </el-table-column>
       </el-table>
   </el-row>
@@ -165,10 +151,9 @@ export default {
         keystr: this.keystr,
         page: this.page,
         pagesize: this.pagesize,
-        token: this.token,
-        flow_ids: 'f_ChuMen_001'
+        token: this.token
       }
-      service.getAllOutOrder(params).then(data => {
+      service.changeAssetList(params).then(data => {
         if (data.ID === '-1') {
           this.$message({
             type: 'error',

@@ -9,6 +9,16 @@
       <el-form-item label="计划说明" prop="plan_memo">
         <el-input v-model="submitForm.plan_memo"></el-input>
       </el-form-item>
+      <el-form-item label="盘点方式：" required>
+          <el-select v-model="submitForm.planType" placeholder="请选择">
+          <el-option
+            v-for="item in checkPlanTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <!-- <el-form-item label="任务执行人" prop="executor">
         <el-select filterable v-model="submitForm.executor" placeholder="请选择任务执行人">
           <el-option v-for="(item, index) in allPersons" :key="index" :label="item" :value="item"></el-option>
@@ -16,7 +26,9 @@
       </el-form-item> -->
       <el-form-item label="截止日期" required>
         <el-form-item prop="deadline">
-          <el-date-picker type="date" placeholder="请选择截止日期" v-model="submitForm.deadline" ></el-date-picker>
+          <el-date-picker type="date" 
+            :picker-options="pickOption"
+            placeholder="请选择截止日期" v-model="submitForm.deadline" ></el-date-picker>
         </el-form-item>
       </el-form-item>
       <!-- <el-form-item>
@@ -35,6 +47,7 @@
 import moment from 'moment'
 import datagrid from '@/components/common/datagrid.vue'
 import api from '@/api'
+import { checkPlanTypeOptions } from '@/service/common.js'
 import {
   mapGetters
 } from 'vuex'
@@ -58,6 +71,12 @@ export default {
   },
   data () {
     return {
+      pickOption: {
+        disabledDate (time) {
+          return time.getTime() < Date.now() - 8.64e7
+        }
+      },
+      checkPlanTypeOptions: checkPlanTypeOptions,
       loading: false,
       alert: {
         text: '',
@@ -79,7 +98,8 @@ export default {
         executor: '',
         deadlineDate: '',
         deadline: '',
-        asset_id: []
+        asset_id: [],
+        planType: 'rfid'
       },
       submitRule: {
         plan_name: [
@@ -158,7 +178,16 @@ export default {
       }
     },
     handleSubmit (formName) {
-      let _deadlineDate = moment(this.submitForm.deadline).format('YYYY-MM-DD')
+      let _deadlineDate
+      if (this.submitForm.deadline) {
+        _deadlineDate = moment(this.submitForm.deadline).format('YYYY-MM-DD')
+      } else {
+        this.$message({
+          type: 'error',
+          message: `请填写截止日期`
+        })
+        return false
+      }
       this.$refs.submitForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -167,7 +196,8 @@ export default {
             plan_name: this.submitForm.plan_name,
             deadline: _deadlineDate,
             create_person: JSON.parse(sessionStorage.getItem('user')).UserID,
-            token: window.sessionStorage.getItem('token')
+            token: window.sessionStorage.getItem('token'),
+            planType: this.submitForm.planType
           }
           api.postCheck(params).then(data => {
             this.loading = false

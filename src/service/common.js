@@ -48,4 +48,41 @@ const limitTypes = [
     label: '短信'
   }
 ]
-export {remindOptions, remindTypes, limitTypes}
+const tagTypeOptions = [
+  {
+    value: '固定资产普通标签',
+    label: '固定资产普通标签'
+  },
+  {
+    value: '固定资产RFID标签（抗金属）',
+    label: '固定资产RFID标签（抗金属）'
+  },
+  {
+    value: '固定资产RFID标签（非抗金属）',
+    label: '固定资产RFID标签（非抗金属）'
+  },
+  {
+    value: '父资产普通标签',
+    label: '父资产普通标签'
+  }
+]
+const checkPlanTypeOptions = [
+  {
+    value: 'rfid',
+    label: 'RFID读取'
+  },
+  {
+    value: 'app',
+    label: '手机APP扫码拍照'
+  },
+  {
+    value: 'person',
+    label: '人工核对'
+  }
+]
+const checkPlanType = {
+  rfid: 'RFID读取',
+  app: '手机APP扫码拍照',
+  person: '人工核对'
+}
+export {remindOptions, remindTypes, limitTypes, tagTypeOptions, checkPlanTypeOptions, checkPlanType}

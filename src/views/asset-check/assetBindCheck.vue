@@ -60,13 +60,31 @@
       :before-close="closeBindDialog"
       width="70%"
       title="添加资产">
-      <el-row  class="padding-10 text-right">
+      <el-row class="padding-10 text-right">
          <el-input 
           class="w-400"
           placeholder="请输入资产名称/资产编码/责任部门/责任人"
           v-model="assetkeystr" @keyup.enter.native="getAddAssetList">
           <el-button slot="append" icon="el-icon-search" @click="getAddAssetList"></el-button>
         </el-input>
+      </el-row>
+      <el-row class="padding-10 text-right searchForm">
+        <el-form ref="searchForm" label-width="100px" :model="searchForm">
+              <el-row :gutter="16">
+                <el-col :span="8"  class="pull-right">
+                  <el-form-item label="标签类型：">
+                     <el-select v-model="searchForm.tag_type" clearable multiple placeholder="请选择">
+                      <el-option
+                        v-for="item in tagTypeOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+        </el-form>
       </el-row>
       <div class="w-full" style="display: flex;">
         <!-- <div class="w-200 padding-10">
@@ -96,6 +114,7 @@
                   {{scope.row.start_time | moment}}
                 </template>
               </el-table-column>
+              <el-table-column prop="tag_type" label="标签类型"></el-table-column>
               <el-table-column prop="zrr_name" label="责任人姓名"></el-table-column>
               <el-table-column prop="deparment" label="部门 "></el-table-column>
               <!-- <el-table-column width="100" label="操作">
@@ -143,6 +162,7 @@ import uploadFileDialog from '@/components/uploadFileDialog.vue'
 import {TokenAPI} from '@/request/TokenAPI'
 import { type } from '../../../static/data'
 import api from '@/api'
+import { tagTypeOptions } from '@/service/common.js'
 // import moment from 'moment'
 export default {
   components: {
@@ -177,6 +197,9 @@ export default {
       bindAssetVisible: false,
       assetList: [
       ],
+      searchForm: {
+        tag_type: []
+      },
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -222,7 +245,8 @@ export default {
         full: '#67c23a'
       },
       percentage: 0,
-      checkValue: 'less'
+      checkValue: 'less',
+      tagTypeOptions: tagTypeOptions
     }
   },
   methods: {
@@ -360,11 +384,19 @@ export default {
     },
     // 获取要添加的资产信息列表
     getAddAssetList () {
+      let tagType = ''
+      if (this.searchForm.tag_type && this.searchForm.tag_type.length > 0) {
+        this.searchForm.tag_type.forEach((value, index) => {
+          index === this.searchForm.tag_type.length - 1 ? tagType += `${value}` : tagType += `${value},`
+        })
+      }
+      console.log(tagType)
       let params = {
         page: this.assetsPage,
         pagesize: this.assetsPagesize,
         keystr: this.assetkeystr,
-        token: window.sessionStorage.getItem('token')
+        token: window.sessionStorage.getItem('token'),
+        tag_type: tagType
       }
       api.getAssetBase16(params).then(data => {
         if (data.ID === '-1') {
@@ -550,6 +582,17 @@ export default {
     position: relative;
     .el-select{
       width: 160px;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-top: -$global-gap/2;
+    }
+  }
+
+  .searchForm {
+    .el-select{
+      width: 100%;
       position: absolute;
       left: 0;
       top: 50%;

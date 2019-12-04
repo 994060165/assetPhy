@@ -31,6 +31,9 @@ export default {
   getAllOutOrder: params => {
     return axios.post(`/flow/index/getAllOutOrder`, params).then(res => res.data)
   },
+  changeAssetList: params => {
+    return axios.post(`/flow/index/changeAssetList`, params).then(res => res.data)
+  },
   getsentLabel: params => {
     return axios.post(`/res/index/getsentLabel`, params).then(res => res.data)
   },

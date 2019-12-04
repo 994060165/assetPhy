@@ -176,6 +176,7 @@ export default {
     },
     uploadSuccess (resData) {
       this.handleClose()
+      this.handleEnterPageone()
       console.log(resData)
     },
     editRule (row) {

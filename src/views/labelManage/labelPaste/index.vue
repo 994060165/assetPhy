@@ -19,14 +19,19 @@
   <el-row class="padding-10" v-loading="loading">
     <assetTable
       :tableList="tableList">
-      <el-table-column label="标签领用人" width="120" align="center" slot="handle">
+      <el-table-column label="责任人" width="120" align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.bind_person}}</span>
+          <span>{{scope.row.zrr_name}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="粘贴状态" width="120" align="center" slot="handle">
+        <template slot-scope="scope">
+          <span>{{scope.row.bind_status}}</span>
         </template>
       </el-table-column>
       <el-table-column label="领取时间"  align="center" slot="handle">
         <template slot-scope="scope">
-          <span>{{scope.row.bind_date}}</span>
+          <span>{{scope.row.start_time}}</span>
         </template>
       </el-table-column>
       <el-table-column label="提醒" width="120" slot="handle">
@@ -122,7 +127,7 @@ export default {
         pagesize: this.pagesize,
         token: this.token
       }
-      service.getStickLabelList(params).then(data => {
+      service.getassetlike(params).then(data => {
         this.total = data.count
         this.tableList = data.data
       }).finally(() => {

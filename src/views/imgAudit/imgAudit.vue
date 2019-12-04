@@ -27,6 +27,17 @@
         <!-- <el-table-column prop="parent_tag_num" label="父资产标签号"></el-table-column>
         <el-table-column prop="parent_name" label="父资产名称"></el-table-column> -->
         <el-table-column prop="value" label="基本当前成本 "></el-table-column>
+        <el-table-column label="OCR识别状态">
+          <template slot-scope="scope">
+            <span v-if="scope.row.ocrStatus === 0" class="color-green">
+              信息匹配正常
+            </span>
+            <el-tooltip class="item" v-else-if="scope.row.ocrStatus > 0" effect="dark" :content="scope.row.tipStr" placement="top">
+              <span class="color-organge cursor-pointer">信息匹配异常</span>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column prop="ocr_str" label="OCR识别信息" show-overflow-tooltip></el-table-column>
         <el-table-column prop="start_time" label="启用日期">
           <template slot-scope="scope">
             {{scope.row.start_time | moment}}
@@ -157,21 +168,50 @@ export default {
         keystr: this.keystr,
         token: this.token
       }
-      this.$request.post('/res/index/getassetlike', params).then(res => {
+      this.$request.post('/res/index/auditLabel', params).then(res => {
         let data = res.data
-        this.tableList = data.data
-        this.loading = false
-        this.total = data.count
-        this.$nextTick(() => {
-          let rows = this.checkMapData(data.data)
-          rows.forEach(row => {
-            this.$refs.table.toggleRowSelection(row, true)
+        if (data.ID === '1') {
+          this.tableList = this.updateStatus(data.list.data)
+          console.log('tableList', this.tableList)
+          this.loading = false
+          this.total = data.list.count
+          this.$nextTick(() => {
+            let rows = this.checkMapData(data.list.data)
+            rows.forEach(row => {
+              this.$refs.table.toggleRowSelection(row, true)
+            })
           })
-        })
+        }
       }, error => {
         console.log(error)
         this.loading = false
       })
+    },
+    updateStatus (dataList) {
+      dataList.forEach(value => {
+        let tipStr = ''
+        let num = 0
+        if (value.ocr_str && value.ocr_str.indexOf(value.asset_num) === -1) {
+          tipStr += `提示信息：设备标签码未识别！`
+          num += 1
+        }
+        if (value.ocr_str && value.ocr_str.indexOf(value.deparment) === -1) {
+          num > 0 ? tipStr += `部门信息未识别！` : tipStr += `提示信息：部门信息未识别！`
+          num += 1
+        }
+        if (value.ocr_str && value.ocr_str.indexOf(value.name) === -1) {
+          num > 0 ? tipStr += `设备名称未识别！` : tipStr += `提示信息：设备名称未识别！`
+          num += 1
+        }
+        if (!value.ocr_str) {
+          num > 0 ? tipStr += `OCR识别失败！` : tipStr += `提示信息：OCR识别失败！`
+          num += 1
+        }
+        value.ocrStatus = num
+        value.tipStr = tipStr
+        value.ocr_str = value.ocr_scr ? value.ocr_str.slice(1) : '未获取到OCR识别信息！'
+      })
+      return dataList
     },
     seeDetail (row) {
       this.assetnum = `${row.asset_num}`

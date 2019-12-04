@@ -142,7 +142,7 @@ export default {
             } else {
               that.$message({
                 type: 'success',
-                message: `上传成功!插入表中${data.savaRows}条。`
+                message: `上传成功!插入表中${data.saveRows}条。`
               })
               this.uploadProgressStr = 100
             }
