@@ -143,7 +143,7 @@ export default {
       this.$request.post('/res/index/getassetlike', params).then(res => {
         let data = res.data
         this.loading2 = false
-        if (data.data && data.data.length > 0) {
+        if (data.data) {
           this.tableList = data.data
           this.loading2 = false
           this.total = data.count

@@ -236,7 +236,7 @@ export default {
       _params.pagesize = this.pagesize
       _params.print_status = this.printStatus
       api.fetchAssetList(_params).then(data => {
-        if (data.data && data.data.length > 0) {
+        if (data.data) {
           this.isFuzzy = false
           this.tableList = data.data
           this.loading2 = false
